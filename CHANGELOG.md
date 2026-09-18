@@ -66,6 +66,16 @@ release was a syntax-highlighting-only TextMate grammar.
   engine the editor uses, so every position a type name or procedure name can
   appear in is covered and regressions fail the build.
 
+- **Cross-check against the compiler's keyword table.** `tools/gen-data.mjs` now
+  reads `src/compiler/symb-keyword.bas` when a compiler checkout is available and
+  reports keywords the manual data does not cover. It found several real gaps:
+  `ImageCreate` was missing (its page names itself `**""ImageCreate""**`, and the
+  name scan was picking up a bolded *parameter default* instead, producing a
+  bogus `transparent_color` entry), `AndAlso`/`OrElse` were titled
+  "Operator ANDALSO (…)"; and eight pages that merely mention "declare function"
+  — `Type`, `As`, `Any`, `Declare`, `Override`, `FBARRAY`, `__Fastcall`,
+  `__Thiscall` — were classified as procedures and inserted as calls.
+
 ### Changed
 
 - **Rewritten in TypeScript** and bundled with esbuild into a single

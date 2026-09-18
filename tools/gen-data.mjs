@@ -44,6 +44,20 @@ function cleanWiki(s) {
 		.trim();
 }
 
+/**
+ * The bolded identifier in a syntax section: `**Left**`, `**""ImageCreate""**`.
+ * Skips bolded text that is not a name (parameter defaults, keywords quoted in
+ * prose) and returns undefined when there is none, so the caller can fall back
+ * to the page title.
+ */
+function boldName(rawSyntax) {
+	for (const m of rawSyntax.matchAll(/\*\*(.+?)\*\*/g)) {
+		const text = unescapeWakka(m[1]).replace(/"/g, '').trim();
+		if (/^[A-Za-z_][A-Za-z0-9_]*$/.test(text)) return text;
+	}
+	return undefined;
+}
+
 /** Content of a {{fbdoc item="..."}} block, up to the next item or EOF. */
 function section(text, name) {
 	const re = new RegExp(
@@ -125,14 +139,24 @@ function parsePage(file, text) {
 	const syntaxLines = sectionLines(text, 'syntax');
 	const usageLines = sectionLines(text, 'usage');
 
-	// Canonical spelling from the bolded name in the syntax, else the title
-	let name = title;
-	const bold = syntaxLines.join(' ').match(/\*\*([A-Za-z_][A-Za-z0-9_]*)\*\*/);
-	if (bold) name = bold[1]; // already cleaned of ** by cleanWiki? keep raw parse below
-
+	// Canonical spelling from the bolded name in the syntax, else the title.
+	// The manual bolds quoted names too -- ImageCreate's syntax section says
+	// **""ImageCreate""** -- so the escapes and the quotes have to come off
+	// before the name can be recognised. Taking the first bolded identifier
+	// without doing that used to yield the default value of a parameter
+	// instead: "transparent_color".
 	const rawSyntax = section(text, 'syntax');
-	const boldRaw = rawSyntax.match(/\*\*([A-Za-z_][A-Za-z0-9_]*)\*\*/);
-	if (boldRaw) name = boldRaw[1];
+	let name = boldName(rawSyntax) ?? title;
+
+	// Operator pages are titled "Operator ANDALSO (Short Circuit Conjunction)".
+	// The word operators are usable in an expression, so they are worth
+	// offering; the punctuation ones ("Operator + (Addition)") are not, and
+	// keep their unwieldy name, which isCompletableName() then filters out.
+	const operatorWord = name
+		.replace(/\s*\([^()]*\)\s*$/, '')
+		.trim()
+		.match(/^operator[ \t]+([A-Za-z_][A-Za-z0-9_]*)$/i);
+	if (operatorWord) name = operatorWord[1];
 
 	// kind: declared function/sub, or a statement/operator keyword
 	let kind = 'keyword';
@@ -142,6 +166,21 @@ function parsePage(file, text) {
 	else if (usageLines.some((l) => /^[A-Za-z_][A-Za-z0-9_]*\s*\(/.test(l) && l.includes('='))) {
 		// "result = Abs( number )" style usage without a declare line
 		kind = 'function';
+	}
+
+	// A page can mention "declare function" while documenting something that is
+	// not a procedure at all: the calling-convention pages are written
+	// "declare Sub name __Fastcall", so the bolded name is a modifier, not the
+	// procedure. Only a name sitting right after the function/sub keyword is a
+	// declaration -- anything else is a keyword, which also keeps it from being
+	// inserted as a call.
+	if (kind !== 'keyword' && /declare\s+(?:function|sub)\b/i.test(joined)) {
+		const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+		const declaration = new RegExp(
+			`\\b(?:declare\\s+)?(?:function|sub)\\s+\\*{0,2}"*${escaped}\\b`,
+			'i',
+		);
+		if (!declaration.test(joined)) kind = 'keyword';
 	}
 
 	// signatures from the syntax section
@@ -405,6 +444,20 @@ console.log(
 		.sort((a, b) => b[1] - a[1])
 		.slice(0, 6),
 );
+// The compiler's lexer is the authority on what the language accepts, the
+// manual on what it means. Comparing the two is how "ImageCreate" and the
+// "AndAlso"/"OrElse" operators were found missing from this data.
+try {
+	const table = readFileSync(join(fbcRoot, 'src', 'compiler', 'symb-keyword.bas'), 'utf8');
+	const rows = [...table.matchAll(/\(\s*@"([^"]+)"\s*,\s*(FB_TK_\w+)\s*,\s*(FB_TKCLASS_\w+)/g)];
+	const covered = new Set(items.map((i) => i.name.toLowerCase()));
+	const absent = rows.map((m) => m[1]).filter((n) => !covered.has(n.toLowerCase()));
+	console.log(`  compiler: ${rows.length} keywords, ${absent.length} with no page in this data`);
+	if (absent.length > 0) console.log('    no manual page:', absent.join(', '));
+} catch {
+	// no compiler checkout alongside: nothing to compare against
+}
+
 for (const want of ['left', 'abs', 'screenres', 'dim', 'open', 'operator']) {
 	const found = items.filter((i) => i.name.toLowerCase() === want);
 	console.log(

@@ -447,7 +447,7 @@
   {
    "name": "Any",
    "title": "ANY",
-   "kind": "sub",
+   "kind": "keyword",
    "category": "Procedures",
    "summary": "The Any keyword is used as a placeholder for a type or value in various ways.",
    "usage": [],
@@ -595,7 +595,7 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgAny",
    "page": "KeyPgAny",
-   "id": "any|sub"
+   "id": "any|keyword"
   },
   {
    "name": "Append",
@@ -5611,7 +5611,7 @@
   {
    "name": "Declare",
    "title": "DECLARE",
-   "kind": "function",
+   "kind": "keyword",
    "category": "Procedures",
    "summary": "Declares a module-level or member procedure",
    "usage": [],
@@ -5685,7 +5685,7 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgDeclare",
    "page": "KeyPgDeclare",
-   "id": "declare|function"
+   "id": "declare|keyword"
   },
   {
    "name": "DefByte",
@@ -7476,7 +7476,7 @@
   {
    "name": "FBARRAY",
    "title": "FBARRAY (array descriptor structure and access)",
-   "kind": "function",
+   "kind": "keyword",
    "category": "Array Functions",
    "summary": "Pre-defined structure (UDT) and procedure declarations from the fbc-int/array.bi include file, usable to access the array descriptor data fields.",
    "usage": [
@@ -7738,7 +7738,7 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgFBArray",
    "page": "KeyPgFBArray",
-   "id": "fbarray|function"
+   "id": "fbarray|keyword"
   },
   {
    "name": "fb_MemCopy",
@@ -7878,16 +7878,16 @@
    "id": "false|keyword"
   },
   {
-   "name": "__FASTCALL",
+   "name": "__Fastcall",
    "title": "__FASTCALL",
-   "kind": "function",
+   "kind": "keyword",
    "category": "Procedures",
    "summary": "Specifies the Fastcall calling convention in a procedure declaration",
    "usage": [],
    "signatures": [
     {
-     "text": "declare Sub __FASTCALL \"\"__Fastcall\"\" Overload] Alias \"\"\"alias\"\"\"] ( parameters )",
-     "label": "__FASTCALL(parameters)",
+     "text": "declare Sub __Fastcall \"\"__Fastcall\"\" Overload] Alias \"\"\"alias\"\"\"] ( parameters )",
+     "label": "__Fastcall(parameters)",
      "params": [
       {
        "mode": "",
@@ -7897,8 +7897,8 @@
      ]
     },
     {
-     "text": "declare Function __FASTCALL \"\"__Fastcall\"\" Overload] Alias \"\"\"alias\"\"\"] ( parameters ) [ Byref ] as return_type",
-     "label": "__FASTCALL(parameters)",
+     "text": "declare Function __Fastcall \"\"__Fastcall\"\" Overload] Alias \"\"\"alias\"\"\"] ( parameters ) [ Byref ] as return_type",
+     "label": "__Fastcall(parameters)",
      "params": [
       {
        "mode": "",
@@ -7908,8 +7908,8 @@
      ]
     },
     {
-     "text": "Sub __FASTCALL [\"\"__Fastcall\"\"] Overload] Alias \"\"\"alias\"\"\"] ( parameters )",
-     "label": "__FASTCALL(parameters)",
+     "text": "Sub __Fastcall [\"\"__Fastcall\"\"] Overload] Alias \"\"\"alias\"\"\"] ( parameters )",
+     "label": "__Fastcall(parameters)",
      "params": [
       {
        "mode": "",
@@ -7919,8 +7919,8 @@
      ]
     },
     {
-     "text": "Function __FASTCALL [\"\"__Fastcall\"\"] Overload] Alias \"\"\"alias\"\"\"] ( parameters ) [ Byref ] as return_type",
-     "label": "__FASTCALL(parameters)",
+     "text": "Function __Fastcall [\"\"__Fastcall\"\"] Overload] Alias \"\"\"alias\"\"\"] ( parameters ) [ Byref ] as return_type",
+     "label": "__Fastcall(parameters)",
      "params": [
       {
        "mode": "",
@@ -7933,7 +7933,7 @@
    "dialect": [],
    "url": "https://www.freebasic.net/wiki/KeyPgFastcall",
    "page": "KeyPgFastcall",
-   "id": "__fastcall|function"
+   "id": "__fastcall|keyword"
   },
   {
    "name": "Field",
@@ -9455,7 +9455,7 @@
    "id": "imageinfo|function"
   },
   {
-   "name": "transparent_color",
+   "name": "ImageCreate",
    "title": "IMAGECREATE",
    "kind": "function",
    "category": "2D Drawing Functions",
@@ -9466,7 +9466,7 @@
    "signatures": [
     {
      "text": "declare function \"\"ImageCreate\"\" ( byval width as long, byval height as long, byval color as ulong = transparent_color ) as any ptr",
-     "label": "transparent_color(width, height, color)",
+     "label": "ImageCreate(width, height, color)",
      "params": [
       {
        "mode": "byval",
@@ -9487,7 +9487,7 @@
     },
     {
      "text": "declare function \"\"ImageCreate\"\" ( byval width as long, byval height as long, byval color as ulong = transparent_color, byval depth as long ) as any ptr",
-     "label": "transparent_color(width, height, color, depth)",
+     "label": "ImageCreate(width, height, color, depth)",
      "params": [
       {
        "mode": "byval",
@@ -9517,7 +9517,7 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgImagecreate",
    "page": "KeyPgImagecreate",
-   "id": "transparent_color|function"
+   "id": "imagecreate|function"
   },
   {
    "name": "implements",
@@ -12548,7 +12548,7 @@
    "id": "and|keyword"
   },
   {
-   "name": "Operator ANDALSO",
+   "name": "AndAlso",
    "title": "Operator ANDALSO (Short Circuit Conjunction)",
    "kind": "keyword",
    "category": "Short Circuit Operators",
@@ -12559,7 +12559,7 @@
    "signatures": [
     {
      "text": "declare operator \"\"AndAlso\"\" ( byref lhs as T1, byref rhs as T2 ) as Ret",
-     "label": "Operator ANDALSO(lhs, rhs)",
+     "label": "AndAlso(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -12577,7 +12577,7 @@
    "dialect": [],
    "url": "https://www.freebasic.net/wiki/KeyPgOpAndAlso",
    "page": "KeyPgOpAndAlso",
-   "id": "operator andalso|keyword"
+   "id": "andalso|keyword"
   },
   {
    "name": "Operator",
@@ -15852,7 +15852,7 @@
    "id": "or|keyword"
   },
   {
-   "name": "Operator ORELSE",
+   "name": "OrElse",
    "title": "Operator ORELSE (Short Circuit Inclusive Disjunction)",
    "kind": "keyword",
    "category": "Short Circuit Operators",
@@ -15863,7 +15863,7 @@
    "signatures": [
     {
      "text": "declare operator \"\"OrElse\"\" ( byref lhs as T1, byref rhs as T2 ) as Ret",
-     "label": "Operator ORELSE(lhs, rhs)",
+     "label": "OrElse(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -15881,7 +15881,7 @@
    "dialect": [],
    "url": "https://www.freebasic.net/wiki/KeyPgOpOrElse",
    "page": "KeyPgOpOrElse",
-   "id": "operator orelse|keyword"
+   "id": "orelse|keyword"
   },
   {
    "name": "Operator Placement New",
@@ -16758,7 +16758,7 @@
   {
    "name": "As",
    "title": "OPEN COM",
-   "kind": "function",
+   "kind": "keyword",
    "category": "File I/O Functions",
    "summary": "Opens a serial port for input and output, using it as if it were file operations.",
    "usage": [
@@ -16787,7 +16787,7 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpenCom",
    "page": "KeyPgOpenCom",
-   "id": "as|function"
+   "id": "as|keyword#KeyPgOpenCom"
   },
   {
    "name": "As",
@@ -17380,7 +17380,7 @@
   {
    "name": "Override",
    "title": "OVERRIDE",
-   "kind": "sub",
+   "kind": "keyword",
    "category": "User Defined Types",
    "summary": "Method attribute; specifies that a method must override a virtual",
    "usage": [],
@@ -17420,7 +17420,7 @@
    "dialect": [],
    "url": "https://www.freebasic.net/wiki/KeyPgOverride",
    "page": "KeyPgOverride",
-   "id": "override|sub"
+   "id": "override|keyword"
   },
   {
    "name": "Paint",
@@ -21987,16 +21987,16 @@
    "id": "this|keyword"
   },
   {
-   "name": "__THISCALL",
+   "name": "__Thiscall",
    "title": "__THISCALL",
-   "kind": "function",
+   "kind": "keyword",
    "category": "Procedures",
    "summary": "Specifies the Thiscall calling convention in a procedure declaration",
    "usage": [],
    "signatures": [
     {
-     "text": "declare Sub __THISCALL \"\"__Thiscall\"\" Overload] Alias \"\"\"alias\"\"\"] ( parameters )",
-     "label": "__THISCALL(parameters)",
+     "text": "declare Sub __Thiscall \"\"__Thiscall\"\" Overload] Alias \"\"\"alias\"\"\"] ( parameters )",
+     "label": "__Thiscall(parameters)",
      "params": [
       {
        "mode": "",
@@ -22006,8 +22006,8 @@
      ]
     },
     {
-     "text": "declare Function __THISCALL \"\"__Thiscall\"\" Overload] Alias \"\"\"alias\"\"\"] ( parameters ) [ Byref ] as return_type",
-     "label": "__THISCALL(parameters)",
+     "text": "declare Function __Thiscall \"\"__Thiscall\"\" Overload] Alias \"\"\"alias\"\"\"] ( parameters ) [ Byref ] as return_type",
+     "label": "__Thiscall(parameters)",
      "params": [
       {
        "mode": "",
@@ -22017,8 +22017,8 @@
      ]
     },
     {
-     "text": "Sub __THISCALL [\"\"__Thiscall\"\"] Overload] Alias \"\"\"alias\"\"\"] ( parameters )",
-     "label": "__THISCALL(parameters)",
+     "text": "Sub __Thiscall [\"\"__Thiscall\"\"] Overload] Alias \"\"\"alias\"\"\"] ( parameters )",
+     "label": "__Thiscall(parameters)",
      "params": [
       {
        "mode": "",
@@ -22028,8 +22028,8 @@
      ]
     },
     {
-     "text": "Function __THISCALL [\"\"__Thiscall\"\"] Overload] Alias \"\"\"alias\"\"\"] ( parameters ) [ Byref ] as return_type",
-     "label": "__THISCALL(parameters)",
+     "text": "Function __Thiscall [\"\"__Thiscall\"\"] Overload] Alias \"\"\"alias\"\"\"] ( parameters ) [ Byref ] as return_type",
+     "label": "__Thiscall(parameters)",
      "params": [
       {
        "mode": "",
@@ -22042,7 +22042,7 @@
    "dialect": [],
    "url": "https://www.freebasic.net/wiki/KeyPgThiscall",
    "page": "KeyPgThiscall",
-   "id": "__thiscall|function"
+   "id": "__thiscall|keyword"
   },
   {
    "name": "ThreadCall",
@@ -22511,7 +22511,7 @@
   {
    "name": "Type",
    "title": "TYPE (UDT)",
-   "kind": "sub",
+   "kind": "keyword",
    "category": "User Defined Types",
    "summary": "Declares a user-defined type.",
    "usage": [],
@@ -22715,7 +22715,7 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgType",
    "page": "KeyPgType",
-   "id": "type|sub"
+   "id": "type|keyword"
   },
   {
    "name": "Type",
@@ -22734,7 +22734,7 @@
    "dialect": [],
    "url": "https://www.freebasic.net/wiki/KeyPgTypeAlias",
    "page": "KeyPgTypeAlias",
-   "id": "type|keyword"
+   "id": "type|keyword#KeyPgTypeAlias"
   },
   {
    "name": "Type",

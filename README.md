@@ -148,7 +148,10 @@ npm run package   # produces freebasic-<version>.vsix
 ```
 
 The completion database is generated from the FreeBASIC manual and is committed
-to `src/data/`. To refresh it against a newer manual checkout:
+to `src/data/`. The generator also cross-checks its result against the compiler's
+own keyword table (`src/compiler/symb-keyword.bas`) and reports any keyword the
+manual data does not cover, which is how `ImageCreate` and the `AndAlso`/`OrElse`
+operators were found missing. To refresh it against a newer manual checkout:
 
 ```sh
 node tools/gen-data.mjs /path/to/fbc

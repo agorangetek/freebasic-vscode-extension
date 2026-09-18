@@ -174,3 +174,49 @@ test('continuations are capitalised', () => {
 		assert.ok(detail.length > 0, `${label} has no detail`);
 	}
 });
+
+test('names come from the page, not from a parameter default', () => {
+	// ImageCreate's syntax section writes its name as **""ImageCreate""**, so a
+	// naive bolded-identifier scan used to pick up the bolded default value of
+	// its colour parameter instead
+	const imageCreate = lookupBuiltin('ImageCreate');
+	assert.ok(imageCreate, 'ImageCreate is missing');
+	assert.equal(imageCreate.kind, 'function');
+	assert.ok(imageCreate.summary.length > 0);
+	assert.match(imageCreate.signatures[0]?.label ?? '', /^ImageCreate\(/);
+	assert.ok(
+		!allBuiltins().some((i) => i.name === 'transparent_color'),
+		'a parameter default must not become an item',
+	);
+});
+
+test('word operators are offered, punctuation ones are not', () => {
+	// the pages are titled "Operator ANDALSO (Short Circuit Conjunction)"
+	assert.equal(lookupBuiltin('AndAlso')?.kind, 'keyword');
+	assert.equal(lookupBuiltin('OrElse')?.kind, 'keyword');
+	assert.equal(isCompletableName('AndAlso'), true);
+	// "Operator + (Addition)" documents punctuation: usable as documentation,
+	// not as something to type
+	assert.equal(isCompletableName('Operator +'), false);
+});
+
+test('a page mentioning "declare function" is not always a function', () => {
+	// these document a modifier or a statement, so they must not be inserted as
+	// a call with a parameter placeholder
+	for (const name of ['Type', 'As', 'Any', 'Declare', 'Override', '__Fastcall']) {
+		const item = lookupBuiltin(name);
+		assert.ok(item, `${name} is missing`);
+		assert.equal(item.kind, 'keyword', `${name} must not be a procedure`);
+	}
+	// ... while the ones that really are procedures stay procedures
+	for (const name of ['Left', 'ScreenRes', 'Abs', 'Sleep']) {
+		assert.equal(lookupBuiltin(name)?.kind, 'function', `${name} lost its kind`);
+	}
+});
+
+test('the manual spelling is kept when the examples do not use the name', () => {
+	// the calling conventions are written __Fastcall / __Thiscall in the manual
+	// and never appear in the examples, so nothing should rename them
+	assert.equal(lookupBuiltin('__Fastcall')?.name, '__Fastcall');
+	assert.equal(lookupBuiltin('__Thiscall')?.name, '__Thiscall');
+});
