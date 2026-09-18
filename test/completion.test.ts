@@ -221,7 +221,7 @@ test('a block opener expands into the whole block', () => {
 	const fn = items.find((i) => i.label === 'Function');
 	assert.ok(fn, 'Function is offered at the start of a statement');
 	assert.equal(fn.isSnippet, true);
-	assert.equal(fn.insertText, 'function ${1:name}(${2}) as ${3:integer}\n\t$0\nend function');
+	assert.equal(fn.insertText, 'Function ${1:name}(${2}) As ${3:Integer}\n\t$0\nEnd Function');
 	assert.match(fn.detail, /End Function/);
 
 	// every block from the manual is offered, and closed
@@ -312,4 +312,27 @@ test('declaration prefixes get the bare keyword, not a block', () => {
 	const fn = items.find((i) => i.label === 'Function');
 	assert.equal(fn?.isSnippet, false);
 	assert.equal(fn?.insertText, 'Function');
+});
+
+test('what gets inserted is spelled like the label that was offered', () => {
+	// the popup shows "Function" or "End If"; inserting "function" would be a
+	// different token as far as the reader is concerned
+	const items = [...complete(1, 2), ...complete(4, 6)];
+	assert.ok(items.length > 100, 'expected a large list to check');
+	for (const item of items) {
+		assert.ok(
+			item.insertText.startsWith(item.label),
+			`"${item.label}" inserts "${item.insertText.split('\n')[0]}"`,
+		);
+	}
+});
+
+test('block continuations are spelled like the block they close', () => {
+	const labels = complete(1, 2).map((i) => i.label);
+	for (const closer of ['End Sub', 'End Function', 'End If', 'End Select', 'End Type', 'Next', 'Loop', 'Wend']) {
+		assert.ok(labels.includes(closer), `${closer} is offered, got ${labels.filter((l) => /end|next|loop|wend/i.test(l)).join(', ')}`);
+	}
+	for (const extra of ['Else', 'ElseIf', 'Case', 'Case Else', 'Continue', 'Exit']) {
+		assert.ok(labels.includes(extra), `${extra} is offered`);
+	}
 });

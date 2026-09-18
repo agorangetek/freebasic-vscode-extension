@@ -3,7 +3,7 @@
  * the VS Code layer (src/extension.ts) converts to vscode.CompletionItem.
  */
 import { allBlocks, allBuiltins, builtinMarkdown, isCompletableName } from './builtins.ts';
-import { BLOCK_CONTINUATIONS, blockBody, endWords, isDeclarationPrefix } from './blocks.ts';
+import { blockBody, blockContinuations, endWords, isDeclarationPrefix } from './blocks.ts';
 import { parameterNames, statementContextAt } from './parser.ts';
 import type {
 	FbBuiltin,
@@ -256,7 +256,8 @@ export function buildCompletions(request: CompletionRequest): FbCompletionItem[]
 	// 7. at the start of a statement, the block openers expand into a whole
 	//    skeleton -- that is where "End Function" comes from
 	if (options.keywords && freshStatement && !isDeclarationPrefix(context.before)) {
-		for (const block of allBlocks()) {
+		const blocks = allBlocks();
+		for (const block of blocks) {
 			const body = options.snippets ? blockBody(block) : undefined;
 			push({
 				label: block.opener,
@@ -268,7 +269,7 @@ export function buildCompletions(request: CompletionRequest): FbCompletionItem[]
 				sortText: RANK.keyword + (body ? '0' : '1') + block.opener.toLowerCase(),
 			});
 		}
-		for (const { label, detail } of BLOCK_CONTINUATIONS) {
+		for (const { label, detail } of blockContinuations(blocks)) {
 			push({
 				label,
 				kind: 'keyword',

@@ -442,7 +442,7 @@ test('integration: extension host wiring', { skip: !esbuild && 'esbuild not inst
 		assert.ok(fn.insertText instanceof SnippetString);
 		assert.equal(
 			(fn.insertText as SnippetString).value,
-			'function ${1:name}(${2}) as ${3:integer}\n\t$0\nend function',
+			'Function ${1:name}(${2}) As ${3:Integer}\n\t$0\nEnd Function',
 		);
 	});
 

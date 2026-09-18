@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { blockBody, blockContinuations } from '../src/service/blocks.ts';
 import {
 	allBlocks,
 	allBuiltins,
@@ -144,4 +145,32 @@ test('names are identifiers, not manual page titles', () => {
 	assert.equal(isCompletableName('DRAW STRING'), true);
 	assert.equal(isCompletableName('#INCLUDE'), true);
 	assert.equal(isCompletableName('__FB_DARWIN__'), true);
+});
+
+test('blocks are capitalised, and their snippets match', () => {
+	for (const block of allBlocks()) {
+		assert.match(block.opener, /^[A-Z]/, `${block.opener} opens a block`);
+		assert.match(block.closer, /^[A-Z]/, `${block.closer} closes it`);
+
+		const body = blockBody(block);
+		if (!body) continue;
+		// what gets inserted must read like the label that was offered
+		assert.ok(
+			body.startsWith(block.opener),
+			`${block.opener} inserts "${body.split('\n')[0]}"`,
+		);
+		assert.ok(
+			body.includes(block.closer),
+			`${block.opener} does not insert its closer ${block.closer}`,
+		);
+	}
+});
+
+test('continuations are capitalised', () => {
+	const seen = blockContinuations(allBlocks());
+	assert.ok(seen.length >= allBlocks().length);
+	for (const { label, detail } of seen) {
+		assert.match(label, /^[A-Z]/, `"${label}" must be capitalised`);
+		assert.ok(detail.length > 0, `${label} has no detail`);
+	}
 });
