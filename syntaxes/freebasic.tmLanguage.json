@@ -480,6 +480,13 @@
 				{ "include": "#object-types" }
 			]
 		},
+		"type-references": {
+			"comment": "A type name following 'as'. Built-in datatypes are matched first, by #standard-data-types, and keep their storage.type.* scope; this catches user-defined types such as 'as Vec2'. The lookbehind skips a 'const' modifier so 'as const string' still scopes const as a modifier and string as a datatype.",
+			"match": "(?i)(?<=\\bas[ \\t]+(?:const[ \\t]+)?)(?!const\\b)([a-z_][a-z0-9_]*)",
+			"captures": {
+				"1": { "name": "entity.name.type.freebasic" }
+			}
+		},
 		"integer-types": {
 			"name": "storage.type.integer.freebasic",
 			"match": "(?i)\\bu?(?:byte|short|long|integer|longint)\\b"
@@ -544,6 +551,7 @@
 				},
 				{ "include": "#variable-dimensions" },
 				{ "include": "#standard-data-types" },
+				{ "include": "#type-references" },
 				{ "include": "#expressions" }
 			]
 		},
@@ -587,6 +595,7 @@
 				},
 				{ "include": "#procedure-parameters" },
 				{ "include": "#standard-data-types" },
+				{ "include": "#type-references" },
 				{ "include": "#string-literals" },
 				{ "include": "#preprocessor" }
 			]
@@ -609,6 +618,7 @@
 					"match": "[=,]"
 				},
 				{ "include": "#standard-data-types" },
+				{ "include": "#type-references" },
 				{ "include": "#expressions" }
 			]
 		},
@@ -639,6 +649,8 @@
 					"name": "variable.language.freebasic",
 					"match": "(?i)\\b(?:this|base)\\b"
 				},
+				{ "include": "#standard-data-types" },
+				{ "include": "#type-references" },
 				{ "include": "$self" }
 			]
 		},
@@ -710,6 +722,7 @@
 				},
 				{ "include": "#type-member-field-dimensions" },
 				{ "include": "#standard-data-types" },
+				{ "include": "#type-references" },
 				{ "include": "#expressions" }
 			]
 		},
@@ -750,7 +763,8 @@
 					"name": "keyword.other.declaration.freebasic",
 					"match": "(?i)\\bas\\b"
 				},
-				{ "include": "#standard-data-types" }
+				{ "include": "#standard-data-types" },
+				{ "include": "#type-references" }
 			]
 		},
 		"type-member-procedure-parameters": {
@@ -771,6 +785,7 @@
 					"match": "[=,]"
 				},
 				{ "include": "#standard-data-types" },
+				{ "include": "#type-references" },
 				{ "include": "#expressions" }
 			]
 		},
@@ -820,6 +835,7 @@
 				},
 				{ "include": "#union-member-field-dimensions" },
 				{ "include": "#standard-data-types" },
+				{ "include": "#type-references" },
 				{ "include": "#expressions" }
 			]
 		},
@@ -860,7 +876,8 @@
 					"name": "keyword.other.declaration.freebasic",
 					"match": "(?i)\\bas\\b"
 				},
-				{ "include": "#standard-data-types" }
+				{ "include": "#standard-data-types" },
+				{ "include": "#type-references" }
 			]
 		},
 		"union-member-procedure-parameters": {
@@ -881,6 +898,7 @@
 					"match": "[=,]"
 				},
 				{ "include": "#standard-data-types" },
+				{ "include": "#type-references" },
 				{ "include": "#expressions" }
 			]
 		},

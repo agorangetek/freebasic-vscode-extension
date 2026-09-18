@@ -35,6 +35,21 @@ release was a syntax-highlighting-only TextMate grammar.
 - Unit tests for the parser, the completion engine and the generated data,
   runnable with `npm test` on stock Node (no VS Code required).
 
+### Fixed
+
+- **Type names are highlighted consistently.** The grammar scoped a type name
+  where it was declared (`type Vec2`) but not where it was used, so
+  `dim x as Vec2`, `byref v as Vec2` and a function's return type fell through
+  to the editor's default foreground — blue in one place, plain grey in another.
+  A procedure's return type after the parameter list was missed even for
+  built-in datatypes (`function f() as double`). A new `#type-references` rule,
+  included everywhere `#standard-data-types` already was, scopes user-defined
+  type names as types without disturbing the `storage.type.*` scopes built-in
+  datatypes already had.
+- Tokenization tests (`test/grammar.test.ts`) run the grammar through the same
+  engine the editor uses, so every position a type name can appear in is
+  covered and regressions fail the build.
+
 ### Changed
 
 - **Rewritten in TypeScript** and bundled with esbuild into a single
