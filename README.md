@@ -78,7 +78,12 @@ documents it.
 
 The grammar scopes more than it used to, so a theme can colour things
 consistently. Every scope below is specific to FreeBASIC, which means a
-`textMateRules` entry can target it without touching other languages:
+`textMateRules` entry can target it without touching other languages.
+
+They are also the *conventional* TextMate scopes, deliberately: a theme colours
+FreeBASIC the same way it colours C# or any other language, with no per-language
+configuration. Under VS Code's default dark theme that means blue keywords, pink
+control flow, teal type names and yellow methods.
 
 | what | scope |
 | --- | --- |
@@ -89,7 +94,7 @@ consistently. Every scope below is specific to FreeBASIC, which means a
 | datatypes (`Integer`, `Double`) | `storage.type.*.freebasic` |
 | declared variables | `variable.other.freebasic` |
 
-To colour them, add rules such as:
+To colour them differently, add rules such as:
 
 ```jsonc
 "editor.tokenColorCustomizations": {
