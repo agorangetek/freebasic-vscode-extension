@@ -291,3 +291,77 @@ test('a statement head is only a call when it cannot be anything else', { skip }
 	assert.ok(arr?.scopes.includes('variable.other.freebasic'), 'a declared array is a variable');
 	assert.ok(!arr?.scopes.includes('entity.name.function.freebasic'), 'a declared array is not a call');
 });
+
+/* --------------------------------------------------------- members and uses */
+
+const MEMBER_FIXTURE = [
+	'type Vec2', //                                  0
+	'\tx as double', //                             1 field
+	'\ty, z as double', //                          2 more fields
+	'end type', //                                   3
+	'', //                                           4
+	'sub Main()', //                                 5
+	'\tdim result as vec2', //                      6
+	'\tresult.x = -v.y', //                         7 member access
+	'\treturn result', //                           8 variable use
+	'top:', //                                       9 label
+	'\tgoto top', //                                10
+	'end sub', //                                    11
+].join('\n');
+
+test('fields and member accesses have their own scope', { skip }, async () => {
+	const lines = await tokenize(MEMBER_FIXTURE);
+	// the fields declared in the type
+	for (const [line, name] of [
+		[1, 'x'],
+		[2, 'y'],
+		[2, 'z'],
+	] as const) {
+		const token = lines[line]!.find((t) => t.text.trim() === name);
+		assert.ok(token, `line ${line + 1}: ${name} vanished`);
+		assert.ok(
+			token.scopes.includes('variable.other.member.freebasic'),
+			`line ${line + 1}: field ${name} should be a member, got ${token.scopes.join(' ') || 'no scope'}`,
+		);
+	}
+	// the members reached through a '.'
+	const line = lines[7]!;
+	for (const name of ['x', 'y']) {
+		const token = line.find((t) => t.text.trim() === name);
+		assert.ok(token?.scopes.includes('variable.other.member.freebasic'), `${name} should be a member`);
+	}
+	// ... while what holds them stays a variable
+	const result = line.find((t) => t.text.trim() === 'result');
+	assert.ok(result?.scopes.includes('variable.other.freebasic'), 'result should be a variable');
+	const v = line.find((t) => t.text.trim() === 'v');
+	assert.ok(v?.scopes.includes('variable.other.freebasic'), 'v should be a variable');
+});
+
+test('a variable is scoped where it is used, not only where declared', { skip }, async () => {
+	const lines = await tokenize(MEMBER_FIXTURE);
+	const returned = lines[8]!.find((t) => t.text.trim() === 'result');
+	assert.ok(
+		returned?.scopes.includes('variable.other.freebasic'),
+		`a use should be scoped like its declaration, got ${returned?.scopes.join(' ') || 'no scope'}`,
+	);
+	// the declaration agrees
+	const declared = lines[6]!.find((t) => t.text.trim() === 'result');
+	assert.ok(declared?.scopes.includes('variable.other.freebasic'));
+});
+
+test('the catch-all does not swallow keywords, calls or labels', { skip }, async () => {
+	const lines = await tokenize(MEMBER_FIXTURE);
+	// a label is a label, not a variable
+	const label = lines[9]!.find((t) => t.text.trim() === 'top');
+	assert.ok(!label?.scopes.includes('variable.other.freebasic'), 'a label is not a variable');
+	// a call keeps the function scope rather than falling through
+	const calls = await tokenize('\tscaleBy(1)\n\tdrawBox 1, 2');
+	const scaleBy = calls[0]!.find((t) => t.text.trim() === 'scaleBy');
+	assert.ok(scaleBy?.scopes.includes('entity.name.function.freebasic'), 'a call stays a call');
+	const drawBox = calls[1]!.find((t) => t.text.trim() === 'drawBox');
+	assert.ok(drawBox?.scopes.includes('entity.name.function.freebasic'), 'a statement head stays a call');
+	// a built-in keeps its own scope
+	const builtin = await tokenize('\tdim n as integer');
+	const integer = builtin[0]!.find((t) => t.text.trim() === 'integer');
+	assert.ok(integer?.scopes.includes('storage.type.integer.freebasic'), 'integer stays a datatype');
+});

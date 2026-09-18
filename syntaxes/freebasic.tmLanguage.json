@@ -6,14 +6,7 @@
 		{ "include": "#declarations" },
 		{ "include": "#control-flow" },
 		{ "include": "#scoping" },
-		{ "include": "#expressions" },
-		{
-			"comment": "A statement head that is not a keyword is a call to a sub or function, with or without parentheses. Excludes assignment (=), labels (:) and member access (.).",
-			"match": "(?i)(?<=^[ \\t]*)([a-z_][a-z0-9_]*)\\b(?![ \\t]*[=:.])",
-			"captures": {
-				"1": { "name": "entity.name.function.freebasic" }
-			}
-		}
+		{ "include": "#expressions" }
 	],
 	"repository": {
 		"preprocessor": {
@@ -300,10 +293,31 @@
 				{ "include": "#single-quote-comments"},
 				{ "include": "#keywords"},
 				{
+					"comment": "A statement head that is not a keyword is a call to a sub or function, with or without parentheses. Excludes assignment (=), labels (:) and member access (.), which are handled below.",
+					"match": "(?i)(?<=^[ \\t]*)([a-z_][a-z0-9_]*)\\b(?![ \\t]*[=:.])",
+					"captures": {
+						"1": { "name": "entity.name.function.freebasic" }
+					}
+				},
+				{
+					"comment": "A field or method reached through '.' or '->'. The operator itself is matched first, by #operators, so this only sees what follows it.",
+					"match": "(?i)(?<=\\.|->)([a-z_][a-z0-9_]*)",
+					"captures": {
+						"1": { "name": "variable.other.member.freebasic" }
+					}
+				},
+				{
 					"comment": "A call to a procedure the grammar does not know by name. Listed after #keywords so built-ins keep their own scope.",
 					"match": "(?i)\\b([a-z_][a-z0-9_]*)(?=[ \\t]*\\()",
 					"captures": {
 						"1": { "name": "entity.name.function.freebasic" }
+					}
+				},
+				{
+					"comment": "Anything left over is a variable or a parameter. Last in #expressions, so keywords, built-ins and calls keep their own scope, and a label (name followed by ':') is left alone.",
+					"match": "(?i)\\b([a-z_][a-z0-9_]*)\\b(?![ \\t]*:)",
+					"captures": {
+						"1": { "name": "variable.other.freebasic" }
 					}
 				}
 			]
@@ -747,6 +761,20 @@
 					"match": "(?i)(?:\\:|\\bas\\b)"
 				},
 				{
+					"comment": "The field's own name, at the start of its declaration.",
+					"match": "(?i)(?<=^[ \\t]*)([a-z_][a-z0-9_]*)",
+					"captures": {
+						"1": { "name": "variable.other.member.freebasic" }
+					}
+				},
+				{
+					"comment": "Further fields on one line: 'x, y as double'.",
+					"match": "(?i)(?<=,)[ \\t]*([a-z_][a-z0-9_]*)",
+					"captures": {
+						"1": { "name": "variable.other.member.freebasic" }
+					}
+				},
+				{
 					"name": "keyword.operator.freebasic",
 					"match": "[,=]"
 				},
@@ -866,6 +894,20 @@
 				{
 					"name": "keyword.other.declaration.freebasic",
 					"match": "(?i)(?:\\:|\\bas\\b)"
+				},
+				{
+					"comment": "The field's own name, at the start of its declaration.",
+					"match": "(?i)(?<=^[ \\t]*)([a-z_][a-z0-9_]*)",
+					"captures": {
+						"1": { "name": "variable.other.member.freebasic" }
+					}
+				},
+				{
+					"comment": "Further fields on one line: 'x, y as double'.",
+					"match": "(?i)(?<=,)[ \\t]*([a-z_][a-z0-9_]*)",
+					"captures": {
+						"1": { "name": "variable.other.member.freebasic" }
+					}
 				},
 				{
 					"name": "keyword.operator.freebasic",

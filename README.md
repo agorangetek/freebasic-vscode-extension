@@ -99,7 +99,8 @@ control flow, teal type names and yellow methods.
 | built-in functions (`Left`, `ScreenRes`, …) | `support.function.*.freebasic` |
 | type names (`Vec2`) | `entity.name.type.freebasic` |
 | datatypes (`Integer`, `Double`) | `storage.type.*.freebasic` |
-| declared variables | `variable.other.freebasic` |
+| variables, where declared and where used | `variable.other.freebasic` |
+| type fields and member access (`v.x`) | `variable.other.member.freebasic` |
 
 To colour them differently, add rules such as:
 

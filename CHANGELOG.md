@@ -49,6 +49,13 @@ release was a syntax-highlighting-only TextMate grammar.
   intrinsic defines keep their upper case. Completion, the block scaffolds and
   Format Text all agree, so what the list shows is what gets inserted.
 
+- **Fields and variables are scoped.** A type's fields, a member reached
+  through `.` or `->`, and every use of a variable (not just its declaration)
+  now carry a scope, so they stop falling back to the editor's default
+  foreground while the declaration two lines above is coloured. Fields are
+  `variable.other.member.freebasic`, variables are `variable.other.freebasic`,
+  which a theme normally paints the same way.
+
 ### Fixed
 
 - **Type names are highlighted consistently.** The grammar scoped a type name
