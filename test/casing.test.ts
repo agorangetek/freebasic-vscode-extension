@@ -80,3 +80,42 @@ test('an empty document and a document with nothing to fix are unchanged', () =>
 	const clean = 'Sub main()\nEnd Sub';
 	assert.deepEqual(capitalizeIdentifiers(clean), { text: clean, changes: 0 });
 });
+
+test('a declared symbol outranks a built-in spelled the same way', () => {
+	// "Name" is a built-in statement (rename a file), but the author's own
+	// procedure is called "name" and must keep that spelling
+	const source = [
+		'function name() as double',
+		'\treturn 1.0',
+		'end function',
+		'',
+		'sub main()',
+		'\tprint name()',
+		'end sub',
+	].join('\n');
+	const { text } = format(source);
+	assert.ok(text.includes('Function name() As Double'), text);
+	assert.ok(text.includes('Print name()'), 'the call follows the declaration');
+	assert.ok(!text.includes('Name()'), text);
+});
+
+test('built-ins are still capitalised when nothing declares them', () => {
+	const { text } = format(['sub main()', '\tdim s as string', '\tname "a" as "b"', 'end sub'].join('\n'));
+	assert.ok(text.includes('\tName "a" As "b"'), text);
+});
+
+test('a declared name shadowing a built-in function keeps its spelling', () => {
+	const source = [
+		'function left(byval s as string) as string',
+		'\treturn s',
+		'end function',
+		'sub main()',
+		'\tprint left("abc")',
+		'end sub',
+	].join('\n');
+	const { text } = format(source);
+	assert.ok(text.includes('Function left('), text);
+	assert.ok(text.includes(') As String'), text);
+	assert.ok(text.includes('Print left("abc")'), 'the built-in call follows the declaration');
+	assert.ok(!text.includes('Left('), text);
+});

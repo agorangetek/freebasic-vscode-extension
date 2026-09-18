@@ -51,18 +51,23 @@ export function capitalizeIdentifiers(
 ): CapitalizeResult {
 	let canonical: Map<string, string> | undefined;
 	const lookup = (lower: string): string | undefined => {
-		const builtin = BUILTIN_NAMES.get(lower);
-		if (builtin) return builtin;
-		if (declaredNames.length === 0) return undefined;
-		canonical ??= (() => {
-			const map = new Map<string, string>();
-			for (const name of declaredNames) {
-				const key = name.toLowerCase();
-				if (name.length > 0 && !map.has(key)) map.set(key, name);
-			}
-			return map;
-		})();
-		return canonical.get(lower);
+		// A symbol the document declares is the author's own name, so it wins
+		// over a built-in spelled the same way: `function name()` must not be
+		// rewritten to the manual's `Name` statement, and `dim left as ...`
+		// keeps its spelling rather than becoming `Left`.
+		if (declaredNames.length > 0) {
+			canonical ??= (() => {
+				const map = new Map<string, string>();
+				for (const name of declaredNames) {
+					const key = name.toLowerCase();
+					if (name.length > 0 && !map.has(key)) map.set(key, name);
+				}
+				return map;
+			})();
+			const own = canonical.get(lower);
+			if (own) return own;
+		}
+		return BUILTIN_NAMES.get(lower);
 	};
 
 	const maskedLines = maskSource(text);
