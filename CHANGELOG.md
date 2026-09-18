@@ -35,12 +35,11 @@ release was a syntax-highlighting-only TextMate grammar.
 - Unit tests for the parser, the completion engine and the generated data,
   runnable with `npm test` on stock Node (no VS Code required).
 
-- **Format Text** (`freebasic.formatText`): rewrites every identifier with a
-  known canonical spelling -- keywords, datatypes, built-in functions, block
-  terminators and the document's own declared symbols. Available on the editor
+- **Format Text** (`freebasic.formatText`): fixes the spelling of keywords,
+  datatypes, built-in functions and block terminators. Available on the editor
   context menu, in the command palette, and through
-  *Format Document* / *Format Selection*. Comments and string literals are never
-  modified.
+  *Format Document* / *Format Selection*. The author's own symbols are never
+  rewritten in any spelling, and neither are comments or string literals.
 
 ### Fixed
 

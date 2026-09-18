@@ -49,11 +49,16 @@ FreeBASIC does not care about case, so the extension will fix it for you.
 (right-click), in the command palette, and as a formatter for
 *Format Document* / *Format Selection*.
 
-It rewrites every name it knows a spelling for — keywords, datatypes, built-in
-functions, block terminators, and the symbols the document itself declares — and
-leaves everything else byte for byte. Comments and string literals are never
-touched, so `"screenres"` in a message or an `Alias` string stays as written, and
-a call is normalised to however the procedure was declared.
+It fixes the spelling of the *language* — keywords, datatypes, built-in
+functions and block terminators — and leaves everything else byte for byte:
+
+* **Your own names are never touched.** A procedure, type, constant, variable or
+  label declared in the file is skipped in every spelling, so `function name()`
+  keeps its lower case and a local `left` does not become `Left`.
+* **Comments and string literals are never touched**, so `"screenres"` in a
+  message or an `Alias` string stays as written.
+* **Line endings are preserved**, and running it twice changes nothing the
+  second time.
 
 ```freebasic
 sub main()                          Sub main()

@@ -41,32 +41,23 @@ const BUILTIN_NAMES: ReadonlyMap<string, string> = (() => {
 /**
  * Rewrite every identifier that has a known canonical spelling.
  *
- * `declaredNames` (from parseDocument) lets a document's own symbols be
- * normalised to the way they were declared; they never override a built-in
- * spelling.
+ * `declaredNames` (from parseDocument) are the author's own symbols. They are
+ * never rewritten, and never rewritten *to*: the formatter's business is the
+ * language's spelling, not the author's. That also stops a procedure called
+ * `name` from being rewritten to the manual's `Name` statement, or a local
+ * `left` from becoming `Left`.
  */
 export function capitalizeIdentifiers(
 	text: string,
 	declaredNames: readonly string[] = [],
 ): CapitalizeResult {
-	let canonical: Map<string, string> | undefined;
+	const declared = new Set<string>();
+	for (const name of declaredNames) {
+		if (name.length > 0) declared.add(name.toLowerCase());
+	}
+
 	const lookup = (lower: string): string | undefined => {
-		// A symbol the document declares is the author's own name, so it wins
-		// over a built-in spelled the same way: `function name()` must not be
-		// rewritten to the manual's `Name` statement, and `dim left as ...`
-		// keeps its spelling rather than becoming `Left`.
-		if (declaredNames.length > 0) {
-			canonical ??= (() => {
-				const map = new Map<string, string>();
-				for (const name of declaredNames) {
-					const key = name.toLowerCase();
-					if (name.length > 0 && !map.has(key)) map.set(key, name);
-				}
-				return map;
-			})();
-			const own = canonical.get(lower);
-			if (own) return own;
-		}
+		if (declared.has(lower)) return undefined;
 		return BUILTIN_NAMES.get(lower);
 	};
 

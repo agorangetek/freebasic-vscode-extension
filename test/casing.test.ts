@@ -39,7 +39,7 @@ test('comments and string literals are left exactly as written', () => {
 	assert.ok(text.includes('"left( dim"'));
 });
 
-test('uses of a symbol follow its declaration', () => {
+test('the author\'s own names are left exactly as written', () => {
 	const source = [
 		'type Vec2',
 		'\tx as double',
@@ -50,15 +50,21 @@ test('uses of a symbol follow its declaration', () => {
 		'sub main()',
 		'\tdim p as vec2',
 		'\tscaleby p',
+		'\tScaleBy p',
 		'end sub',
 	].join('\n');
 	const { text } = format(source);
-	// the call and the uses are normalised to the declaration
-	assert.ok(text.includes('Function ScaleBy(ByRef v As Vec2) As Vec2'), text);
-	assert.ok(text.includes('\tScaleBy p'), text);
-	assert.ok(text.includes('\tDim p As Vec2'), text);
-	assert.ok(!text.includes('scaleby'), text);
-	assert.ok(!text.includes('vec2'), text);
+	// keywords and datatypes are fixed ...
+	assert.ok(text.includes('End Type'), text);
+	assert.ok(text.includes('Function ScaleBy('), text);
+	assert.ok(text.includes('\tReturn v.x'), text);
+	assert.ok(text.includes('\nSub main()'), text);
+	// ... and not one spelling of a declared name is touched, however it is
+	// written: the declaration, a lowercase use and a capitalised use all
+	// survive side by side
+	for (const untouched of ['ScaleBy(', 'vec2', 'VEC2', 'scaleby p', 'ScaleBy p']) {
+		assert.ok(text.includes(untouched), `${untouched} was rewritten:\n${text}`);
+	}
 });
 
 test('line endings and untouched text are preserved byte for byte', () => {
@@ -81,9 +87,10 @@ test('an empty document and a document with nothing to fix are unchanged', () =>
 	assert.deepEqual(capitalizeIdentifiers(clean), { text: clean, changes: 0 });
 });
 
-test('a declared symbol outranks a built-in spelled the same way', () => {
+test('a declared symbol is never rewritten, even to a built-in spelling', () => {
 	// "Name" is a built-in statement (rename a file), but the author's own
-	// procedure is called "name" and must keep that spelling
+	// procedure is called "name" and must keep that spelling -- in every
+	// direction, so a capitalised use is left alone too
 	const source = [
 		'function name() as double',
 		'\treturn 1.0',
@@ -91,12 +98,14 @@ test('a declared symbol outranks a built-in spelled the same way', () => {
 		'',
 		'sub main()',
 		'\tprint name()',
+		'\tprint Name()',
 		'end sub',
 	].join('\n');
 	const { text } = format(source);
 	assert.ok(text.includes('Function name() As Double'), text);
-	assert.ok(text.includes('Print name()'), 'the call follows the declaration');
-	assert.ok(!text.includes('Name()'), text);
+	assert.ok(text.includes('\tPrint name()'), text);
+	assert.ok(text.includes('\tPrint Name()'), 'a capitalised use is left alone');
+	assert.ok(!text.includes('Function Name('), text);
 });
 
 test('built-ins are still capitalised when nothing declares them', () => {
@@ -104,18 +113,19 @@ test('built-ins are still capitalised when nothing declares them', () => {
 	assert.ok(text.includes('\tName "a" As "b"'), text);
 });
 
-test('a declared name shadowing a built-in function keeps its spelling', () => {
+test('a declared name shadowing a built-in keeps its spelling on both sides', () => {
 	const source = [
 		'function left(byval s as string) as string',
 		'\treturn s',
 		'end function',
 		'sub main()',
 		'\tprint left("abc")',
+		'\tprint Left("abc")',
 		'end sub',
 	].join('\n');
 	const { text } = format(source);
 	assert.ok(text.includes('Function left('), text);
 	assert.ok(text.includes(') As String'), text);
-	assert.ok(text.includes('Print left("abc")'), 'the built-in call follows the declaration');
-	assert.ok(!text.includes('Left('), text);
+	assert.ok(text.includes('\tPrint left("abc")'), text);
+	assert.ok(text.includes('\tPrint Left("abc")'), text);
 });
