@@ -101,8 +101,28 @@
 			{
 				"command": "freebasic.showIndexStats",
 				"title": "FreeBASIC: Show Symbol Index Statistics"
+			},
+			{
+				"command": "freebasic.formatText",
+				"title": "FreeBASIC: Format Text (Capitalize Keywords)",
+				"category": "FreeBASIC"
 			}
-		]
+		],
+		"menus": {
+			"editor/context": [
+				{
+					"command": "freebasic.formatText",
+					"when": "editorLangId == freebasic",
+					"group": "1_modification@10"
+				}
+			],
+			"commandPalette": [
+				{
+					"command": "freebasic.formatText",
+					"when": "editorLangId == freebasic"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"gen-data": "node tools/gen-data.mjs",

@@ -35,6 +35,13 @@ release was a syntax-highlighting-only TextMate grammar.
 - Unit tests for the parser, the completion engine and the generated data,
   runnable with `npm test` on stock Node (no VS Code required).
 
+- **Format Text** (`freebasic.formatText`): rewrites every identifier with a
+  known canonical spelling -- keywords, datatypes, built-in functions, block
+  terminators and the document's own declared symbols. Available on the editor
+  context menu, in the command palette, and through
+  *Format Document* / *Format Selection*. Comments and string literals are never
+  modified.
+
 ### Fixed
 
 - **Type names are highlighted consistently.** The grammar scoped a type name
@@ -46,9 +53,17 @@ release was a syntax-highlighting-only TextMate grammar.
   included everywhere `#standard-data-types` already was, scopes user-defined
   type names as types without disturbing the `storage.type.*` scopes built-in
   datatypes already had.
+- **Procedure names are scoped**, so function and sub names can be coloured.
+  They previously matched no rule at all: only names the grammar happened to
+  list as built-ins were scoped, which left user procedures and newer built-ins
+  (`ScreenRes`, `Locate`) at the editor's default foreground while older ones
+  (`Cls`, `Print`) were coloured. Declarations, member prototypes, calls with
+  parentheses and paren-less calls such as `drawBox 10, 10` are all covered now,
+  and declared variables are scoped as `variable.other.freebasic` so that
+  `dim a(10)` is not mistaken for a call to `a()`.
 - Tokenization tests (`test/grammar.test.ts`) run the grammar through the same
-  engine the editor uses, so every position a type name can appear in is
-  covered and regressions fail the build.
+  engine the editor uses, so every position a type name or procedure name can
+  appear in is covered and regressions fail the build.
 
 ### Changed
 

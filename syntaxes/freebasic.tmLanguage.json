@@ -6,7 +6,14 @@
 		{ "include": "#declarations" },
 		{ "include": "#control-flow" },
 		{ "include": "#scoping" },
-		{ "include": "#expressions" }
+		{ "include": "#expressions" },
+		{
+			"comment": "A statement head that is not a keyword is a call to a sub or function, with or without parentheses. Excludes assignment (=), labels (:) and member access (.).",
+			"match": "(?i)(?<=^[ \\t]*)([a-z_][a-z0-9_]*)\\b(?![ \\t]*[=:.])",
+			"captures": {
+				"1": { "name": "entity.name.function.freebasic" }
+			}
+		}
 	],
 	"repository": {
 		"preprocessor": {
@@ -291,7 +298,14 @@
 				{ "include": "#literals" },
 				{ "include": "#operators" },
 				{ "include": "#single-quote-comments"},
-				{ "include": "#keywords"}
+				{ "include": "#keywords"},
+				{
+					"comment": "A call to a procedure the grammar does not know by name. Listed after #keywords so built-ins keep their own scope.",
+					"match": "(?i)\\b([a-z_][a-z0-9_]*)(?=[ \\t]*\\()",
+					"captures": {
+						"1": { "name": "entity.name.function.freebasic" }
+					}
+				}
 			]
 		},
 		"literals": {
@@ -546,6 +560,13 @@
 					"match": "(?i)\\b(?:alias|byref|const|import|pointer|ptr|shared)\\b"
 				},
 				{
+					"comment": "The declared variable. Matched before #expressions so an array declaration such as 'dim a(10)' is not mistaken for a call to a().",
+					"match": "(?i)(?<=\\b(?:common|const|dim|extern|redim|static|var)[ \\t](?:shared[ \\t]+)?)([a-z_][a-z0-9_]*)",
+					"captures": {
+						"1": { "name": "variable.other.freebasic" }
+					}
+				},
+				{
 					"name": "keyword.operator.freebasic",
 					"match": "[,=]"
 				},
@@ -586,6 +607,14 @@
 			"end": ":|(?<!_)[ \t]*\n",
 			"patterns": [
 				{
+					"comment": "The prototype's name, which is a declaration like any other.",
+					"match": "(?i)\\b(function|sub|operator|property|constructor|destructor)([ \t]+)([a-z_][a-z0-9_]*)",
+					"captures": {
+						"1": { "name": "keyword.other.declaration.procedure.freebasic" },
+						"3": { "name": "entity.name.function.freebasic" }
+					}
+				},
+				{
 					"name": "keyword.other.declaration.procedure.freebasic",
 					"match": "(?i)\\b(?:as|function|operator|sub)\\b"
 				},
@@ -623,10 +652,11 @@
 			]
 		},
 		"procedure-body-declarations": {
-			"begin": "(?i)(?:(private|public)[ \t]+)?\\b(constructor|destructor|operator|property|function|sub)\\b",
+			"begin": "(?i)(?:(private|public)[ \t]+)?\\b(constructor|destructor|operator|property|function|sub)\\b(?:[ \t]+([a-z_][a-z0-9_]*))?",
 			"beginCaptures": {
 				"1": { "name": "storage.modifier.procedure.freebasic" },
-				"2": { "name": "keyword.other.declaration.procedure.body.begin.freebasic" }
+				"2": { "name": "keyword.other.declaration.procedure.body.begin.freebasic" },
+				"3": { "name": "entity.name.function.freebasic" }
 			},
 			"end": "(?i)\\b(end[ \t]+\\2)\\b",
 			"endCaptures": {
@@ -750,6 +780,14 @@
 			},
 			"end": ":|(?<!_)[ \t]*\n",
 			"patterns": [
+				{
+					"comment": "The member procedure's name, which is a declaration like any other.",
+					"match": "(?i)\\b(constructor|destructor|operator|property|function|sub)([ \t]+)([a-z_][a-z0-9_]*)",
+					"captures": {
+						"1": { "name": "keyword.other.declaration.type.member.procedure.freebasic" },
+						"3": { "name": "entity.name.function.freebasic" }
+					}
+				},
 				{
 					"name": "keyword.other.declaration.type.member.procedure.freebasic",
 					"match": "(?i)\\b(?:constructor|destructor|operator|property|function|sub)\\b"

@@ -209,3 +209,85 @@ test('strings and comments are not scanned for types', { skip }, async () => {
 		'a comment must stay a comment',
 	);
 });
+
+/* ------------------------------------------------------------------ names */
+
+const NAME_FIXTURE = [
+	'function rotate90(byref v as Vec2) as Vec2', // 0 declaration
+	'end function', //                              1
+	'sub main()', //                                2 sub declaration
+	'\tdrawBox 10, 10, 64, 64', //                  3 paren-less call
+	'\tscaleBy(v.x, 3.0)', //                       4 call in a statement
+	'\tdim scaled as double = scaleBy(v.x, 3.0)', // 5 call inside a declaration
+	'\tmySub', //                                  6 bare call
+	'\tprint Left("abc", 2)', //                   7 built-in keeps its scope
+	'\tcls', //                                    8 built-in keeps its scope
+	'end sub', //                                   9
+	'type T', //                                   10
+	'\tdeclare sub member(byval a as integer)', // 11 member prototype
+	'end type', //                                 12
+	'declare function proto(byval a as integer) as integer', // 13 prototype
+	'top:', //                                     14 label
+	'\tx = 1', //                                  15 assignment
+	'\tv.x = 2', //                                16 member access
+	'\tdim arr(10) as integer', //                 17 array, not a call
+].join('\n');
+
+test('procedure names are scoped where they are declared', { skip }, async () => {
+	const lines = await tokenize(NAME_FIXTURE);
+	for (const [line, name] of [
+		[0, 'rotate90'],
+		[2, 'main'],
+		[11, 'member'],
+		[13, 'proto'],
+	] as const) {
+		const token = lines[line]!.find((t) => t.text.includes(name));
+		assert.ok(token, `line ${line + 1}: ${name} vanished`);
+		assert.ok(
+			token.scopes.includes('entity.name.function.freebasic'),
+			`line ${line + 1}: ${name} should be entity.name.function.freebasic, got ${token.scopes.join(' ') || 'no scope'}`,
+		);
+	}
+});
+
+test('calls to unknown procedures are scoped, built-ins keep their own', { skip }, async () => {
+	const lines = await tokenize(NAME_FIXTURE);
+
+	// a call the grammar cannot know by name: with and without parentheses
+	for (const [line, name] of [
+		[3, 'drawBox'],
+		[4, 'scaleBy'],
+		[5, 'scaleBy'],
+		[6, 'mySub'],
+	] as const) {
+		const token = lines[line]!.find((t) => t.text.includes(name));
+		assert.ok(token, `line ${line + 1}: ${name} vanished`);
+		assert.ok(
+			token.scopes.includes('entity.name.function.freebasic'),
+			`line ${line + 1}: ${name} should be a function, got ${token.scopes.join(' ') || 'no scope'}`,
+		);
+	}
+
+	// built-ins are listed before the catch-all and must not be swallowed by it
+	const print = lines[7]!.find((t) => t.text.includes('print'));
+	assert.ok(print?.scopes.includes('support.function.console.freebasic'), 'print lost its scope');
+	const left = lines[7]!.find((t) => t.text.includes('Left'));
+	assert.ok(left?.scopes.includes('support.function.string.freebasic'), 'Left lost its scope');
+	const cls = lines[8]!.find((t) => t.text.includes('cls'));
+	assert.ok(cls?.scopes.includes('support.function.graphics.freebasic'), 'cls lost its scope');
+});
+
+test('a statement head is only a call when it cannot be anything else', { skip }, async () => {
+	const lines = await tokenize(NAME_FIXTURE);
+	// a label, an assignment and a member access are not calls
+	const label = lines[14]!.find((t) => t.text.trim() === 'top');
+	assert.ok(!label?.scopes.includes('entity.name.function.freebasic'), 'a label is not a call');
+	const x = lines[15]!.find((t) => t.text.trim() === 'x');
+	assert.ok(!x?.scopes.includes('entity.name.function.freebasic'), 'an assignment target is not a call');
+	const v = lines[16]!.find((t) => t.text.trim() === 'v');
+	assert.ok(!v?.scopes.includes('entity.name.function.freebasic'), 'member access is not a call');
+	// an array declaration is a variable, not a call to arr()
+	const arr = lines[17]!.find((t) => t.text.includes('arr'));
+	assert.ok(arr?.scopes.includes('variable.other.freebasic'), 'a declared array is a variable');
+	assert.ok(!arr?.scopes.includes('entity.name.function.freebasic'), 'a declared array is not a call');
+});

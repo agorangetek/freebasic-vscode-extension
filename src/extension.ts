@@ -6,6 +6,7 @@
  */
 import * as vscode from 'vscode';
 import { builtinCount, builtinSource } from './service/builtins.ts';
+import { capitalizeIdentifiers } from './service/casing.ts';
 import { buildCompletions } from './service/completion.ts';
 import { getHover } from './service/hover.ts';
 import { FbIndex } from './service/index.ts';
@@ -182,6 +183,72 @@ export function activate(context: vscode.ExtensionContext): void {
 				void indexWorkspace(context);
 			}
 		}),
+	);
+
+	/* ------------------------------------------------ format / capitalize */
+
+	/** Rewrite canonical spellings inside `range`, as a single replacement. */
+	function capitalizationEdits(
+		document: vscode.TextDocument,
+		range: vscode.Range,
+	): { edit: vscode.TextEdit; changes: number } | undefined {
+		const source = document.getText(range);
+		const parsed = indexOf(document);
+		const result = capitalizeIdentifiers(
+			source,
+			parsed.symbols.map((s) => s.name),
+		);
+		if (result.changes === 0) return undefined;
+		return { edit: vscode.TextEdit.replace(range, result.text), changes: result.changes };
+	}
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand('freebasic.formatText', async () => {
+			const editor = vscode.window.activeTextEditor;
+			if (!editor || editor.document.languageId !== LANGUAGE) return;
+
+			const selection = editor.selections.find((s) => !s.isEmpty);
+			const range =
+				selection ??
+				new vscode.Range(
+					editor.document.positionAt(0),
+					editor.document.positionAt(editor.document.getText().length),
+				);
+
+			const result = capitalizationEdits(editor.document, range);
+			if (!result) {
+				void vscode.window.showInformationMessage('FreeBASIC: nothing to capitalize.');
+				return;
+			}
+			await editor.edit((builder) => builder.replace(result.edit.range, result.edit.newText));
+			void vscode.window.setStatusBarMessage(
+				`FreeBASIC: capitalized ${result.changes} identifiers.`,
+				4000,
+			);
+		}),
+	);
+
+	// also reachable through Format Document / Format Selection
+	const formattingProvider: vscode.DocumentFormattingEditProvider &
+		vscode.DocumentRangeFormattingEditProvider = {
+		provideDocumentFormattingEdits(document) {
+			const result = capitalizationEdits(
+				document,
+				new vscode.Range(
+					document.positionAt(0),
+					document.positionAt(document.getText().length),
+				),
+			);
+			return result ? [result.edit] : [];
+		},
+		provideDocumentRangeFormattingEdits(document, range) {
+			const result = capitalizationEdits(document, range);
+			return result ? [result.edit] : [];
+		},
+	};
+	context.subscriptions.push(
+		vscode.languages.registerDocumentFormattingEditProvider(LANGUAGE, formattingProvider),
+		vscode.languages.registerDocumentRangeFormattingEditProvider(LANGUAGE, formattingProvider),
 	);
 
 	/* ---------------------------------------------------------- completion */

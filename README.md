@@ -42,11 +42,61 @@ Completion covers the whole language surface, not just keywords:
 Casing is learned at generation time from ~1,500 programs in the FreeBASIC
 `examples/` tree, so proposals look like the code people really write.
 
+### Format Text — canonical casing
+
+FreeBASIC does not care about case, so the extension will fix it for you.
+`FreeBASIC: Format Text (Capitalize Keywords)` is on the editor context menu
+(right-click), in the command palette, and as a formatter for
+*Format Document* / *Format Selection*.
+
+It rewrites every name it knows a spelling for — keywords, datatypes, built-in
+functions, block terminators, and the symbols the document itself declares — and
+leaves everything else byte for byte. Comments and string literals are never
+touched, so `"screenres"` in a message or an `Alias` string stays as written, and
+a call is normalised to however the procedure was declared.
+
+```freebasic
+sub main()                          Sub main()
+  dim x as double                     Dim x As Double
+  screenres 640, 480          ->      ScreenRes 640, 480
+  print left("dim", 3)               Print Left("dim", 3)
+end sub                             End Sub
+```
+
 ### Hover and signature help
 
 Hovering a built-in shows its summary, syntax and manual category. Inside a
 call, the signature help widget highlights the parameter you are on and
 documents it.
+
+### Highlighting scopes
+
+The grammar scopes more than it used to, so a theme can colour things
+consistently. Every scope below is specific to FreeBASIC, which means a
+`textMateRules` entry can target it without touching other languages:
+
+| what | scope |
+| --- | --- |
+| keywords (`Dim`, `If`, `End`, `As`, `Print`, …) | `keyword.control|operator|other.*.freebasic` |
+| procedure names, declared and called | `entity.name.function.freebasic` |
+| built-in functions (`Left`, `ScreenRes`, …) | `support.function.*.freebasic` |
+| type names (`Vec2`) | `entity.name.type.freebasic` |
+| datatypes (`Integer`, `Double`) | `storage.type.*.freebasic` |
+| declared variables | `variable.other.freebasic` |
+
+To colour them, add rules such as:
+
+```jsonc
+"editor.tokenColorCustomizations": {
+    "textMateRules": [
+        { "scope": ["source.freebasic keyword.control"], "settings": { "foreground": "#7ee787" } }
+    ]
+}
+```
+
+Note the `source.freebasic` prefix — it keeps the rule to this language.
+Wrapping the setting in a `"[freebasic]"` block does **not** work for token
+colours; it is silently ignored.
 
 ### Outline and workspace index
 
@@ -71,6 +121,9 @@ workspace are completed across modules.
 * **FreeBASIC: Rebuild Symbol Index** (`freebasic.reindex`) — re-scan the workspace.
 * **FreeBASIC: Show Symbol Index Statistics** (`freebasic.showIndexStats`) — how
   many files and symbols were indexed.
+* **FreeBASIC: Format Text (Capitalize Keywords)** (`freebasic.formatText`) — fix
+  identifier casing in the selection, or in the whole file. On the editor
+  context menu, and registered as the formatter for the language.
 
 ## Building from source
 

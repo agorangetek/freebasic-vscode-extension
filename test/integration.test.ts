@@ -10,6 +10,12 @@
  * Needs esbuild, so it is skipped when devDependencies are not installed.
  */
 import assert from 'node:assert/strict';
+import { lookupBuiltin } from '../src/service/builtins.ts';
+
+/** The generated data's spelling of a name. */
+function builtinName(name: string): string {
+	return lookupBuiltin(name)?.name ?? name;
+}
 import { mkdtempSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
@@ -36,7 +42,24 @@ const registrations: Record<string, Array<{ selector: string; provider: Provider
 	hover: [],
 	signature: [],
 	symbols: [],
+	formatting: [],
+	rangeFormatting: [],
 };
+
+class TextEdit {
+	readonly range: Range;
+	readonly newText: string;
+	constructor(range: Range, newText: string) {
+		this.range = range;
+		this.newText = newText;
+	}
+	static replace(range: Range, newText: string) {
+		return new TextEdit(range, newText);
+	}
+}
+
+/** Edits an active editor received through editor.edit(). */
+const appliedEdits: { range: Range; newText: string }[] = [];
 
 const commands = new Map<string, (...args: any[]) => any>();
 const settings: Record<string, unknown> = {};
@@ -55,6 +78,9 @@ class Position {
 class Range {
 	readonly start: Position;
 	readonly end: Position;
+	get isEmpty() {
+		return this.start.line === this.end.line && this.start.character === this.end.character;
+	}
 	constructor(a: Position | number, b: Position | number, c?: number, d?: number) {
 		if (typeof a === 'number') {
 			this.start = new Position(a, b as number);
@@ -183,6 +209,16 @@ class TextDocument {
 		const text = this.lines[line] ?? '';
 		return { text, range: new Range(line, 0, line, text.length), lineNumber: line };
 	}
+	positionAt(offset: number) {
+		let remaining = offset;
+		for (let i = 0; i < this.lines.length; i++) {
+			const length = this.lines[i].length;
+			if (remaining <= length) return new Position(i, remaining);
+			remaining -= length + 1;
+		}
+		const last = this.lines.length - 1;
+		return new Position(last, this.lines[last].length);
+	}
 	getWordRangeAtPosition(position: Position, re: RegExp) {
 		const line = this.lines[position.line] ?? '';
 		const flags = re.flags.includes('g') ? re.flags : `${re.flags}g`;
@@ -210,6 +246,7 @@ const vscodeMock = {
 	SignatureInformation,
 	SignatureHelp,
 	DocumentSymbol,
+	TextEdit,
 	CompletionItemKind: {
 		Function: 2,
 		Method: 1,
@@ -251,15 +288,17 @@ const vscodeMock = {
 		onDidChangeConfiguration: () => ({ dispose() {} }),
 	},
 	window: {
+		activeTextEditor: undefined as unknown,
+		setStatusBarMessage: () => ({ dispose() {} }),
+		showInformationMessage: (message: string) => {
+			infoMessages.push(message);
+			return Promise.resolve(undefined);
+		},
 		createOutputChannel: () => ({
 			appendLine: (line: string) => outputLines.push(line),
 			show: () => {},
 			dispose: () => {},
 		}),
-		showInformationMessage: (message: string) => {
-			infoMessages.push(message);
-			return Promise.resolve(undefined);
-		},
 	},
 	commands: {
 		registerCommand: (id: string, handler: (...args: any[]) => any) => {
@@ -284,6 +323,14 @@ const vscodeMock = {
 			registrations.symbols.push({ selector, provider });
 			return { dispose() {} };
 		},
+		registerDocumentFormattingEditProvider: (selector: string, provider: Provider) => {
+			registrations.formatting.push({ selector, provider });
+			return { dispose() {} };
+		},
+		registerDocumentRangeFormattingEditProvider: (selector: string, provider: Provider) => {
+			registrations.rangeFormatting.push({ selector, provider });
+			return { dispose() {} };
+		},
 	},
 };
 
@@ -306,6 +353,17 @@ const SAMPLE = [
 const OTHER = ['sub otherProc(byref x as string)', 'end sub'];
 
 const document = new TextDocument('/ws/main.bas', SAMPLE);
+
+const editor = {
+	document,
+	get selections() {
+		return [new Range(0, 0, 0, 0)];
+	},
+	edit: async (callback: (builder: { replace: (r: Range, t: string) => void }) => void) => {
+		callback({ replace: (range: Range, newText: string) => appliedEdits.push({ range, newText }) });
+		return true;
+	},
+};
 const otherFile = new TextDocument('/ws/other.bi', OTHER);
 
 let activation: Promise<void> | undefined;
@@ -335,6 +393,7 @@ async function loadExtension(): Promise<void> {
 
 	const bundle = require(outfile) as { activate: (ctx: unknown) => void };
 	vscodeMock.workspace.textDocuments.push(document, otherFile);
+	vscodeMock.window.activeTextEditor = editor;
 	bundle.activate({ subscriptions: [], workspaceState: undefined });
 }
 
@@ -458,6 +517,40 @@ test('integration: extension host wiring', { skip: !esbuild && 'esbuild not inst
 		assert.ok(labels.includes('Select'));
 		assert.equal(items.find((i) => i.label === 'Function')?.detail, 'end Function');
 		assert.ok(!labels.includes('Dim'), 'ordinary keywords are not offered here');
+	});
+
+	await t.test('registers the Format Text command and a formatter', () => {
+		assert.ok(commands.has('freebasic.formatText'));
+		assert.equal(registrations.formatting[0]?.selector, 'freebasic');
+		assert.equal(registrations.rangeFormatting[0]?.selector, 'freebasic');
+	});
+
+	await t.test('Format Text capitalizes the document', async () => {
+		const doc = new TextDocument('/ws/lower.bas', [
+			'sub mySub(byval a as integer)',
+			'\tdim v as vec2',
+			'\tscreenres 640, 480',
+			'end sub',
+		]);
+		vscodeMock.workspace.textDocuments.push(doc);
+		editor.document = doc;
+		appliedEdits.length = 0;
+
+		await commands.get('freebasic.formatText')!();
+
+		assert.equal(appliedEdits.length, 1, 'expected one whole-document replacement');
+		// the modifier's spelling comes from the generated data (the FreeBASIC
+		// examples corpus writes "Byval"), so read it rather than hard-coding it
+		const byval = builtinName('byval');
+		assert.equal(
+			appliedEdits[0]!.newText,
+			[
+				`Sub mySub(${byval} a As Integer)`,
+				'\tDim v As vec2',
+				'\tScreenRes 640, 480',
+				'End Sub',
+			].join('\n'),
+		);
 	});
 
 	await t.test('document symbols list top-level declarations only', () => {
