@@ -63,6 +63,11 @@ release was a syntax-highlighting-only TextMate grammar.
   editor sees it, and the prefix is what has actually been typed rather than the
   whole word under the cursor.
 
+- **Completion matches in any case.** The editor filters the list a second time
+  after the provider returns it, and each item now carries a `filterText`
+  spelling the typed prefix exactly as it was typed, so `SC`, `sc` and `Sc` all
+  keep `ScreenRes`. The label, which is displayed and inserted, is unchanged.
+
 ### Fixed
 
 - **Type names are highlighted consistently.** The grammar scoped a type name

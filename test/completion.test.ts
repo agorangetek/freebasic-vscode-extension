@@ -358,8 +358,13 @@ test('only items that start with the typed text are offered', () => {
 	assert.ok(le.has('Left'));
 	assert.ok(!le.has('ScreenRes'), 'typing more narrows the list');
 
-	// the editor matches case-insensitively, and so does this
-	assert.ok(labelsFor('SC').has('ScreenRes'));
+	// any case typed finds the name, whatever case it is spelled in
+	for (const typed of ['s', 'S', 'sc', 'SC', 'Sc', 'sCrEeN', 'SCREEN']) {
+		assert.ok(labelsFor(typed).has('ScreenRes'), `typing ${typed} should find ScreenRes`);
+	}
+	for (const typed of ['print', 'PRINT', 'Print', 'pRiNt']) {
+		assert.ok(labelsFor(typed).has('print'), `typing ${typed} should find print`);
+	}
 
 	// with nothing typed, nothing is filtered
 	assert.ok(labelsFor('').has('Abs'));

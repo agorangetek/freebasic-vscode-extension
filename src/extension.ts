@@ -67,11 +67,28 @@ function toCompletionKind(kind: FbCompletionKind): vscode.CompletionItemKind {
 	}
 }
 
-function toCompletionItem(item: FbCompletionItem): vscode.CompletionItem {
+/**
+ * `label`, but with the first characters re-cased to exactly what was typed.
+ *
+ * The editor filters the list itself after the provider has returned it, and
+ * that filter is fuzzy: it also matches at a word boundary inside a name, and
+ * it is the editor's business whether a case mismatch counts. An item's
+ * filterText is what it matches against, so spelling the typed prefix the way
+ * the user typed it makes the item match in any case -- `SC`, `sc` and `Sc` all
+ * keep `ScreenRes` -- without changing the label that is displayed or inserted.
+ * The two strings have the same length, so match highlighting still lines up.
+ */
+function withTypedCase(label: string, typed: string): string {
+	if (typed.length === 0 || label.length < typed.length) return label;
+	if (!label.toLowerCase().startsWith(typed.toLowerCase())) return label;
+	return typed + label.slice(typed.length);
+}
+
+function toCompletionItem(item: FbCompletionItem, typed = ''): vscode.CompletionItem {
 	const result = new vscode.CompletionItem(item.label, toCompletionKind(item.kind));
 	result.detail = item.detail;
 	result.sortText = item.sortText;
-	if (item.filterText) result.filterText = item.filterText;
+	result.filterText = withTypedCase(item.filterText ?? item.label, typed);
 
 	if (item.isSnippet) {
 		result.insertText = new vscode.SnippetString(item.insertText);
@@ -318,7 +335,7 @@ export function activate(context: vscode.ExtensionContext): void {
 					});
 
 					trace(`completion at ${position.line}:${position.character} -> ${items.length} items`);
-					return items.map(toCompletionItem);
+					return items.map((item) => toCompletionItem(item, word));
 				},
 			},
 			'.',

@@ -469,6 +469,21 @@ test('integration: extension host wiring', { skip: !esbuild && 'esbuild not inst
 		assert.ok(infoMessages.some((m) => /indexed \d+ files/.test(m)));
 	});
 
+	await t.test('an item matches whatever case was typed', () => {
+		const doc = new TextDocument('/ws/case.bas', ['SC', '', 'end sub']);
+		vscodeMock.workspace.textDocuments.push(doc);
+		const provider = registrations.completion[0]!.provider;
+		const items = (provider.provideCompletionItems(doc, new Position(0, 2)) ??
+			[]) as CompletionItem[];
+		const screenRes = items.find((i) => i.label === 'ScreenRes');
+		assert.ok(screenRes, `expected ScreenRes, got ${labels(items).join(', ')}`);
+		// the editor filters on filterText, so it has to carry the typed case
+		assert.equal(screenRes.filterText, 'SCreenRes');
+		// ... while the label, which is displayed and inserted, does not
+		assert.equal(screenRes.label, 'ScreenRes');
+		assert.equal(screenRes.filterText?.length, screenRes.label.length);
+	});
+
 	await t.test('typing a character offers only what starts with it', () => {
 		// cursor after the "myS" already on line 9
 		const items = completeAt(9, 3);
