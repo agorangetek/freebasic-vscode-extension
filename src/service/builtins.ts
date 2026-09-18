@@ -3,7 +3,7 @@
  * produced from the FreeBASIC manual by tools/gen-data.mjs).
  */
 import { FB_BUILTINS } from '../data/fb-builtins.ts';
-import type { FbBuiltin } from './types.ts';
+import type { FbBlock, FbBuiltin } from './types.ts';
 
 /** Case-insensitive lookup by name or title. */
 const byName = new Map<string, FbBuiltin>();
@@ -38,6 +38,29 @@ export function builtinSource(): string {
 
 export function builtinCount(): number {
 	return FB_BUILTINS.count;
+}
+
+/** Compound statement blocks, from the manual's terminator list. */
+export function allBlocks(): readonly FbBlock[] {
+	return FB_BUILTINS.blocks;
+}
+
+/** The block that `opener` starts, if any. */
+export function blockForOpener(opener: string): FbBlock | undefined {
+	const lower = opener.toLowerCase();
+	return FB_BUILTINS.blocks.find((b) => b.opener.toLowerCase() === lower);
+}
+
+/**
+ * Whether a built-in's name can be typed as a token.  A few manual pages exist
+ * to document punctuation rather than to name something -- "Operator +",
+ * "Operator []", "PRIVATE:" -- and those have no business in a completion
+ * list, however useful they are as documentation.
+ */
+export function isCompletableName(name: string): boolean {
+	if (/^operator\b/i.test(name)) return false;
+	if (name.startsWith('...')) return false;
+	return /^[A-Za-z_#$][A-Za-z0-9_ #]*$/.test(name);
 }
 
 /** First signature label, e.g. "Left(str, n)", for compact display. */

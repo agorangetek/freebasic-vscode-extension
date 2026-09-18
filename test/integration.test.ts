@@ -430,6 +430,36 @@ test('integration: extension host wiring', { skip: !esbuild && 'esbuild not inst
 		assert.match((signature.documentation as MarkdownString).value, /function Left \(/);
 	});
 
+	await t.test('an opener at the start of a statement brings its closer', () => {
+		// the user is midway through typing "function" on an empty line
+		const doc = new TextDocument('/ws/block.bas', ['fun', '', 'end sub']);
+		vscodeMock.workspace.textDocuments.push(doc);
+		const provider = registrations.completion[0]!.provider;
+		const items = (provider.provideCompletionItems(doc, new Position(0, 3)) ??
+			[]) as CompletionItem[];
+		const fn = items.find((i) => i.label === 'Function');
+		assert.ok(fn, 'Function is offered');
+		assert.ok(fn.insertText instanceof SnippetString);
+		assert.equal(
+			(fn.insertText as SnippetString).value,
+			'function ${1:name}(${2}) as ${3:integer}\n\t$0\nend function',
+		);
+	});
+
+	await t.test('"end" is followed by the block terminators', () => {
+		const doc = new TextDocument('/ws/end.bas', ['sub main()', '  end ', 'end sub']);
+		vscodeMock.workspace.textDocuments.push(doc);
+		const provider = registrations.completion[0]!.provider;
+		const items = (provider.provideCompletionItems(doc, new Position(1, 6)) ??
+			[]) as CompletionItem[];
+		const labels = items.map((i) => i.label);
+		assert.ok(labels.includes('Function'), labels.join(', '));
+		assert.ok(labels.includes('Sub'));
+		assert.ok(labels.includes('Select'));
+		assert.equal(items.find((i) => i.label === 'Function')?.detail, 'end Function');
+		assert.ok(!labels.includes('Dim'), 'ordinary keywords are not offered here');
+	});
+
 	await t.test('document symbols list top-level declarations only', () => {
 		const provider = registrations.symbols[0]!.provider;
 		const symbols = provider.provideDocumentSymbols(document) as DocumentSymbol[];

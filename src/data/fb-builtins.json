@@ -2,6 +2,93 @@
  "source": "FreeBASIC 1.20.0 manual",
  "generatedFrom": "/Users/orangetek/Library/CloudStorage/Dropbox/Programming/Prototype/freebasic-macos/fbc/doc/manual/cache",
  "count": 634,
+ "blocks": [
+  {
+   "opener": "Sub",
+   "closer": "End Sub",
+   "page": "KeyPgSub"
+  },
+  {
+   "opener": "Function",
+   "closer": "End Function",
+   "page": "KeyPgFunction"
+  },
+  {
+   "opener": "If",
+   "closer": "End If",
+   "page": "KeyPgIfthen"
+  },
+  {
+   "opener": "Select Case",
+   "closer": "End Select",
+   "page": "KeyPgSelectcase"
+  },
+  {
+   "opener": "Type",
+   "closer": "End Type",
+   "page": "KeyPgType"
+  },
+  {
+   "opener": "Enum",
+   "closer": "End Enum",
+   "page": "KeyPgEnum"
+  },
+  {
+   "opener": "Scope",
+   "closer": "End Scope",
+   "page": "KeyPgScope"
+  },
+  {
+   "opener": "With",
+   "closer": "End With",
+   "page": "KeyPgWith"
+  },
+  {
+   "opener": "Namespace",
+   "closer": "End Namespace",
+   "page": "KeyPgNamespace"
+  },
+  {
+   "opener": "Extern",
+   "closer": "End Extern",
+   "page": "KeyPgExternBlock"
+  },
+  {
+   "opener": "Constructor",
+   "closer": "End Constructor",
+   "page": "KeyPgConstructor"
+  },
+  {
+   "opener": "Destructor",
+   "closer": "End Destructor",
+   "page": "KeyPgDestructor"
+  },
+  {
+   "opener": "Operator",
+   "closer": "End Operator",
+   "page": "KeyPgOperator"
+  },
+  {
+   "opener": "Property",
+   "closer": "End Property",
+   "page": "KeyPgProperty"
+  },
+  {
+   "opener": "For",
+   "closer": "Next",
+   "page": "KeyPgFornext"
+  },
+  {
+   "opener": "Do",
+   "closer": "Loop",
+   "page": "KeyPgDo"
+  },
+  {
+   "opener": "While",
+   "closer": "Wend",
+   "page": "KeyPgWhile"
+  }
+ ],
  "items": [
   {
    "name": "Abs",
@@ -173,7 +260,7 @@
    "id": "put|keyword"
   },
   {
-   "name": "ALIAS (Name)",
+   "name": "ALIAS",
    "title": "ALIAS (Name)",
    "kind": "keyword",
    "category": "Procedures",
@@ -198,7 +285,7 @@
    "signatures": [
     {
      "text": "declare] { sub | function } usablename Alias \"alternatename\" (...)",
-     "label": "ALIAS (Name)()",
+     "label": "ALIAS()",
      "params": [
       {
        "mode": "",
@@ -211,10 +298,10 @@
    "dialect": [],
    "url": "https://www.freebasic.net/wiki/KeyPgAlias",
    "page": "KeyPgAlias",
-   "id": "alias (name)|keyword"
+   "id": "alias|keyword"
   },
   {
-   "name": "ALIAS (Modifier)",
+   "name": "ALIAS",
    "title": "ALIAS (Modifier)",
    "kind": "keyword",
    "category": "Datatypes",
@@ -228,14 +315,14 @@
    "signatures": [
     {
      "text": "... as [ const ] datatype alias \"modifier\" [ const [ ptr ... ] ]",
-     "label": "ALIAS (Modifier)()",
+     "label": "ALIAS()",
      "params": []
     }
    ],
    "dialect": [],
    "url": "https://www.freebasic.net/wiki/KeyPgAliasModifier",
    "page": "KeyPgAliasModifier",
-   "id": "alias (modifier)|keyword"
+   "id": "alias|keyword#KeyPgAliasModifier"
   },
   {
    "name": "Allocate",
@@ -6220,7 +6307,7 @@
    "id": "do|keyword#KeyPgDoloop"
   },
   {
-   "name": "... (Ellipsis)",
+   "name": "...",
    "title": "... (Ellipsis)",
    "kind": "keyword",
    "category": "Procedures",
@@ -6229,7 +6316,7 @@
    "signatures": [
     {
      "text": "declare { sub | function } proc_name cdecl ( param_list, ... ) { | [ Byref ] As return_type }",
-     "label": "... (Ellipsis)(param_list)",
+     "label": "...(param_list)",
      "params": [
       {
        "mode": "",
@@ -6245,7 +6332,7 @@
     },
     {
      "text": "#define identifier( [ parameters, ] variadic_parameter... ) body",
-     "label": "... (Ellipsis)(parametersvariadic_parameter)",
+     "label": "...(parametersvariadic_parameter)",
      "params": [
       {
        "mode": "",
@@ -6256,7 +6343,7 @@
     },
     {
      "text": "dim array_symbol ([lbound to] ...) as datatype] => { expression_list }",
-     "label": "... (Ellipsis)(lboundto)",
+     "label": "...(lboundto)",
      "params": [
       {
        "mode": "",
@@ -6269,7 +6356,7 @@
    "dialect": [],
    "url": "https://www.freebasic.net/wiki/KeyPgDots",
    "page": "KeyPgDots",
-   "id": "... (ellipsis)|keyword"
+   "id": "...|keyword"
   },
   {
    "name": "Double",
@@ -7387,7 +7474,7 @@
    "id": "extern...end extern|keyword"
   },
   {
-   "name": "FBARRAY (array descriptor structure and access)",
+   "name": "FBARRAY",
    "title": "FBARRAY (array descriptor structure and access)",
    "kind": "function",
    "category": "Array Functions",
@@ -7407,12 +7494,12 @@
    "signatures": [
     {
      "text": "From ./inc/fbc-int/array.bi:",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "%%(freebasic)",
-     "label": "FBARRAY (array descriptor structure and access)(freebasic)",
+     "label": "FBARRAY(freebasic)",
      "params": [
       {
        "mode": "",
@@ -7423,77 +7510,77 @@
     },
     {
      "text": "# if __FB_LANG__ = \"fb\"",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "namespace FBC",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "# endif",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "const FB_MAXDIMENSIONS as integer = 8",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "type FBARRAYDIM",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "dim as uinteger elements '' number of elements",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "dim as integer lbound '' dimension lower bound",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "dim as integer ubound '' dimension upper bound",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "end type",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "const FBARRAY_FLAGS_DIMENSIONS = &h0000000f '' number of entries allocated in dimTb()",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "const FBARRAY_FLAGS_FIXED_DIM = &h00000010 '' array has fixed number of dimensions",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "const FBARRAY_FLAGS_FIXED_LEN = &h00000020 '' array points to fixed-length memory",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "const FBARRAY_FLAGS_RESERVED = &hffffffc0 '' reserved, do not use",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "type FBARRAY",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "dim as any ptr index_ptr '' @array(0, 0, 0, ... )",
-     "label": "FBARRAY (array descriptor structure and access)(0, 0, 0)",
+     "label": "FBARRAY(0, 0, 0)",
      "params": [
       {
        "mode": "",
@@ -7519,57 +7606,57 @@
     },
     {
      "text": "dim as any ptr base_ptr '' start of memory at array lowest bounds",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "dim as uinteger size '' byte size of allocated contents",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "dim as uinteger element_len '' byte size of single element",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "dim as uinteger dimensions '' number of dimensions",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "dim as uinteger flags '' FBARRAY_FLAGS_*",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "'' take care with number of dimensions; fbc may allocate",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "'' a smaller descriptor with fewer than FB_MAXDIMENSIONS",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "'' in dimTb() if it is known at compile time that they",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "'' are never needed. Always respect number of",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "'' dimensions when accessing dimTb()",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "dim as FBARRAYDIM dimTb(0 to FB_MAXDIMENSIONS-1)",
-     "label": "FBARRAY (array descriptor structure and access)(0toFB_MAXDIMENSIONS1)",
+     "label": "FBARRAY(0toFB_MAXDIMENSIONS1)",
      "params": [
       {
        "mode": "",
@@ -7580,22 +7667,22 @@
     },
     {
      "text": "end type",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "extern \"rtlib\"",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
-     "text": "declare function FBARRAY (array descriptor structure and access) alias \"fb_ArrayGetDesc\" _",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "text": "declare function FBARRAY alias \"fb_ArrayGetDesc\" _",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "( array() as any ) as FBC.FBARRAY ptr",
-     "label": "FBARRAY (array descriptor structure and access)(array)",
+     "label": "FBARRAY(array)",
      "params": [
       {
        "mode": "",
@@ -7605,13 +7692,13 @@
      ]
     },
     {
-     "text": "declare function FBARRAY (array descriptor structure and access) alias \"fb_ArrayGetDesc\" _",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "text": "declare function FBARRAY alias \"fb_ArrayGetDesc\" _",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "( array() as const any ) as const FBC.FBARRAY ptr",
-     "label": "FBARRAY (array descriptor structure and access)(array)",
+     "label": "FBARRAY(array)",
      "params": [
       {
        "mode": "",
@@ -7622,27 +7709,27 @@
     },
     {
      "text": "end extern",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "# if __FB_LANG__ = \"fb\"",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "end namespace",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "# endif",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     },
     {
      "text": "%%",
-     "label": "FBARRAY (array descriptor structure and access)()",
+     "label": "FBARRAY()",
      "params": []
     }
    ],
@@ -7651,7 +7738,7 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgFBArray",
    "page": "KeyPgFBArray",
-   "id": "fbarray (array descriptor structure and access)|function"
+   "id": "fbarray|function"
   },
   {
    "name": "fb_MemCopy",
@@ -12281,7 +12368,7 @@
    "id": "on|keyword#KeyPgOngoto"
   },
   {
-   "name": "Operator + (Addition)",
+   "name": "Operator +",
    "title": "Operator + (Addition)",
    "kind": "keyword",
    "category": "Arithmetic Operators",
@@ -12292,7 +12379,7 @@
    "signatures": [
     {
      "text": "declare operator + ( byref lhs as integer, byref rhs as integer ) as integer",
-     "label": "Operator + (Addition)(lhs, rhs)",
+     "label": "Operator +(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -12308,7 +12395,7 @@
     },
     {
      "text": "declare operator + ( byref lhs as uinteger, byref rhs as uinteger ) as uinteger",
-     "label": "Operator + (Addition)(lhs, rhs)",
+     "label": "Operator +(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -12324,7 +12411,7 @@
     },
     {
      "text": "declare operator + ( byref lhs as single, byref rhs as single ) as single",
-     "label": "Operator + (Addition)(lhs, rhs)",
+     "label": "Operator +(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -12340,7 +12427,7 @@
     },
     {
      "text": "declare operator + ( byref lhs as double, byref rhs as double ) as double",
-     "label": "Operator + (Addition)(lhs, rhs)",
+     "label": "Operator +(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -12356,7 +12443,7 @@
     },
     {
      "text": "declare operator + ( byref lhs as T Pointer, byref rhs as integer ) as T Pointer",
-     "label": "Operator + (Addition)(lhs, rhs)",
+     "label": "Operator +(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -12372,7 +12459,7 @@
     },
     {
      "text": "declare operator + ( byref rhs as integer, byref lhs as T Pointer ) as T Pointer",
-     "label": "Operator + (Addition)(rhs, lhs)",
+     "label": "Operator +(rhs, lhs)",
      "params": [
       {
        "mode": "byref",
@@ -12388,7 +12475,7 @@
     },
     {
      "text": "declare operator + ( byref lhs as T, byref rhs as integer ) as T",
-     "label": "Operator + (Addition)(lhs, rhs)",
+     "label": "Operator +(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -12404,7 +12491,7 @@
     },
     {
      "text": "declare operator + ( byref lhs as integer, byref rhs as T ) as T",
-     "label": "Operator + (Addition)(lhs, rhs)",
+     "label": "Operator +(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -12424,7 +12511,7 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpAdd",
    "page": "KeyPgOpAdd",
-   "id": "operator + (addition)|keyword"
+   "id": "operator +|keyword"
   },
   {
    "name": "And",
@@ -12461,7 +12548,7 @@
    "id": "and|keyword"
   },
   {
-   "name": "Operator ANDALSO (Short Circuit Conjunction)",
+   "name": "Operator ANDALSO",
    "title": "Operator ANDALSO (Short Circuit Conjunction)",
    "kind": "keyword",
    "category": "Short Circuit Operators",
@@ -12472,7 +12559,7 @@
    "signatures": [
     {
      "text": "declare operator \"\"AndAlso\"\" ( byref lhs as T1, byref rhs as T2 ) as Ret",
-     "label": "Operator ANDALSO (Short Circuit Conjunction)(lhs, rhs)",
+     "label": "Operator ANDALSO(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -12490,10 +12577,10 @@
    "dialect": [],
    "url": "https://www.freebasic.net/wiki/KeyPgOpAndAlso",
    "page": "KeyPgOpAndAlso",
-   "id": "operator andalso (short circuit conjunction)|keyword"
+   "id": "operator andalso|keyword"
   },
   {
-   "name": "Operator () (Array index)",
+   "name": "Operator",
    "title": "Operator () (Array index)",
    "kind": "function",
    "category": "Indexing Operators",
@@ -12506,7 +12593,7 @@
    "signatures": [
     {
      "text": "declare operator () ( lhs() as T, byref rhs as integer, ... ) byref as T",
-     "label": "Operator () (Array index)(lhs, rhs)",
+     "label": "Operator(lhs, rhs)",
      "params": [
       {
        "mode": "",
@@ -12529,7 +12616,7 @@
    "dialect": [],
    "url": "https://www.freebasic.net/wiki/KeyPgOpArrayIndex",
    "page": "KeyPgOpArrayIndex",
-   "id": "operator () (array index)|function"
+   "id": "operator|function"
   },
   {
    "name": "Let",
@@ -12573,7 +12660,7 @@
    "id": "let|keyword#KeyPgOpAssignment"
   },
   {
-   "name": "Operator @ (Address of)",
+   "name": "Operator @",
    "title": "Operator @ (Address of)",
    "kind": "keyword",
    "category": "Pointer Operators",
@@ -12584,7 +12671,7 @@
    "signatures": [
     {
      "text": "declare operator @ ( byref rhs as T ) as T pointer",
-     "label": "Operator @ (Address of)(rhs)",
+     "label": "Operator @(rhs)",
      "params": [
       {
        "mode": "byref",
@@ -12599,7 +12686,7 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpAt",
    "page": "KeyPgOpAt",
-   "id": "operator @ (address of)|keyword"
+   "id": "operator @|keyword"
   },
   {
    "name": "Cast",
@@ -12650,7 +12737,7 @@
    "id": "cast|keyword#KeyPgOpCast"
   },
   {
-   "name": "Operator += (Add and Assign)",
+   "name": "Operator +=",
    "title": "Operator += (Add and Assign)",
    "kind": "keyword",
    "category": "Assignment Operators",
@@ -12661,7 +12748,7 @@
    "signatures": [
     {
      "text": "declare operator += ( byref lhs as T1, byref rhs as T2 )",
-     "label": "Operator += (Add and Assign)(lhs, rhs)",
+     "label": "Operator +=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -12677,7 +12764,7 @@
     },
     {
      "text": "declare operator += ( byref lhs as T ptr, byref rhs as integer )",
-     "label": "Operator += (Add and Assign)(lhs, rhs)",
+     "label": "Operator +=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -12693,7 +12780,7 @@
     },
     {
      "text": "declare operator += ( byref lhs as string, byref rhs as string )",
-     "label": "Operator += (Add and Assign)(lhs, rhs)",
+     "label": "Operator +=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -12709,7 +12796,7 @@
     },
     {
      "text": "declare operator += ( byref lhs as wstring, byref rhs as wstring )",
-     "label": "Operator += (Add and Assign)(lhs, rhs)",
+     "label": "Operator +=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -12729,10 +12816,10 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpCombineAdd",
    "page": "KeyPgOpCombineAdd",
-   "id": "operator += (add and assign)|keyword"
+   "id": "operator +=|keyword"
   },
   {
-   "name": "Operator AND= (Conjunction and Assign)",
+   "name": "Operator AND=",
    "title": "Operator AND= (Conjunction and Assign)",
    "kind": "keyword",
    "category": "Assignment Operators",
@@ -12742,8 +12829,8 @@
    ],
    "signatures": [
     {
-     "text": "declare operator Operator AND= (Conjunction and Assign)= ( byref lhs as T1, byref rhs as T2 )",
-     "label": "Operator AND= (Conjunction and Assign)(lhs, rhs)",
+     "text": "declare operator Operator AND== ( byref lhs as T1, byref rhs as T2 )",
+     "label": "Operator AND=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -12763,10 +12850,10 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpCombineAnd",
    "page": "KeyPgOpCombineAnd",
-   "id": "operator and= (conjunction and assign)|keyword"
+   "id": "operator and=|keyword"
   },
   {
-   "name": "Operator &= (Concatenate and Assign)",
+   "name": "Operator &=",
    "title": "Operator &= (Concatenate and Assign)",
    "kind": "keyword",
    "category": "Assignment Operators",
@@ -12777,7 +12864,7 @@
    "signatures": [
     {
      "text": "declare operator &= ( byref lhs as string, byref rhs as T2 )",
-     "label": "Operator &= (Concatenate and Assign)(lhs, rhs)",
+     "label": "Operator &=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -12793,7 +12880,7 @@
     },
     {
      "text": "declare operator &= ( byref lhs as wstring, byref rhs as T2 )",
-     "label": "Operator &= (Concatenate and Assign)(lhs, rhs)",
+     "label": "Operator &=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -12813,10 +12900,10 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpCombineConcat",
    "page": "KeyPgOpCombineConcat",
-   "id": "operator &= (concatenate and assign)|keyword"
+   "id": "operator &=|keyword"
   },
   {
-   "name": "Operator /= (Divide and Assign)",
+   "name": "Operator /=",
    "title": "Operator /= (Divide and Assign)",
    "kind": "keyword",
    "category": "Assignment Operators",
@@ -12827,7 +12914,7 @@
    "signatures": [
     {
      "text": "declare operator /= ( byref lhs as T1, byref rhs as T2 )",
-     "label": "Operator /= (Divide and Assign)(lhs, rhs)",
+     "label": "Operator /=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -12847,10 +12934,10 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpCombineDivide",
    "page": "KeyPgOpCombineDivide",
-   "id": "operator /= (divide and assign)|keyword"
+   "id": "operator /=|keyword"
   },
   {
-   "name": "Operator EQV= (Equivalence and Assign)",
+   "name": "Operator EQV=",
    "title": "Operator EQV= (Equivalence and Assign)",
    "kind": "keyword",
    "category": "Assignment Operators",
@@ -12860,8 +12947,8 @@
    ],
    "signatures": [
     {
-     "text": "declare operator Operator EQV= (Equivalence and Assign)= ( byref lhs as T1, byref rhs as T2 )",
-     "label": "Operator EQV= (Equivalence and Assign)(lhs, rhs)",
+     "text": "declare operator Operator EQV== ( byref lhs as T1, byref rhs as T2 )",
+     "label": "Operator EQV=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -12881,10 +12968,10 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpCombineEqv",
    "page": "KeyPgOpCombineEqv",
-   "id": "operator eqv= (equivalence and assign)|keyword"
+   "id": "operator eqv=|keyword"
   },
   {
-   "name": "Operator ^= (Exponentiate and Assign)",
+   "name": "Operator ^=",
    "title": "Operator ^= (Exponentiate and Assign)",
    "kind": "keyword",
    "category": "Assignment Operators",
@@ -12895,7 +12982,7 @@
    "signatures": [
     {
      "text": "declare operator ^= ( byref lhs as double, byref rhs as double )",
-     "label": "Operator ^= (Exponentiate and Assign)(lhs, rhs)",
+     "label": "Operator ^=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -12915,10 +13002,10 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpCombineExponentiate",
    "page": "KeyPgOpCombineExponentiate",
-   "id": "operator ^= (exponentiate and assign)|keyword"
+   "id": "operator ^=|keyword"
   },
   {
-   "name": "Operator IMP= (Implication and Assign)",
+   "name": "Operator IMP=",
    "title": "Operator IMP= (Implication and Assign)",
    "kind": "keyword",
    "category": "Operators",
@@ -12928,8 +13015,8 @@
    ],
    "signatures": [
     {
-     "text": "declare operator Operator IMP= (Implication and Assign)= ( byref lhs as T1, byref rhs as T2 )",
-     "label": "Operator IMP= (Implication and Assign)(lhs, rhs)",
+     "text": "declare operator Operator IMP== ( byref lhs as T1, byref rhs as T2 )",
+     "label": "Operator IMP=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -12949,10 +13036,10 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpCombineImp",
    "page": "KeyPgOpCombineImp",
-   "id": "operator imp= (implication and assign)|keyword"
+   "id": "operator imp=|keyword"
   },
   {
-   "name": "Operator \\= (Integer divide and Assign)",
+   "name": "Operator \\=",
    "title": "Operator \\= (Integer divide and Assign)",
    "kind": "keyword",
    "category": "Assignment Operators",
@@ -12963,7 +13050,7 @@
    "signatures": [
     {
      "text": "declare operator \\= ( byref lhs as T1, byref rhs as T2 )",
-     "label": "Operator \\= (Integer divide and Assign)(lhs, rhs)",
+     "label": "Operator \\=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -12983,10 +13070,10 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpCombineIntegerDivide",
    "page": "KeyPgOpCombineIntegerDivide",
-   "id": "operator \\= (integer divide and assign)|keyword"
+   "id": "operator \\=|keyword"
   },
   {
-   "name": "Operator Mod= (Modulus and Assign)",
+   "name": "Operator Mod=",
    "title": "Operator Mod= (Modulus and Assign)",
    "kind": "keyword",
    "category": "Assignment Operators",
@@ -12996,8 +13083,8 @@
    ],
    "signatures": [
     {
-     "text": "declare operator Operator Mod= (Modulus and Assign)= ( byref lhs as integer, byref rhs as integer )",
-     "label": "Operator Mod= (Modulus and Assign)(lhs, rhs)",
+     "text": "declare operator Operator Mod== ( byref lhs as integer, byref rhs as integer )",
+     "label": "Operator Mod=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13017,10 +13104,10 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpCombineModulus",
    "page": "KeyPgOpCombineModulus",
-   "id": "operator mod= (modulus and assign)|keyword"
+   "id": "operator mod=|keyword"
   },
   {
-   "name": "Operator *= (Multiply and Assign)",
+   "name": "Operator *=",
    "title": "Operator *= (Multiply and Assign)",
    "kind": "keyword",
    "category": "Assignment Operators",
@@ -13031,7 +13118,7 @@
    "signatures": [
     {
      "text": "declare operator *= ( byref lhs as T1, byref rhs as T2 )",
-     "label": "Operator *= (Multiply and Assign)(lhs, rhs)",
+     "label": "Operator *=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13051,10 +13138,10 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpCombineMultiply",
    "page": "KeyPgOpCombineMultiply",
-   "id": "operator *= (multiply and assign)|keyword"
+   "id": "operator *=|keyword"
   },
   {
-   "name": "Operator OR= (Inclusive Disjunction and Assign)",
+   "name": "Operator OR=",
    "title": "Operator OR= (Inclusive Disjunction and Assign)",
    "kind": "keyword",
    "category": "Assignment Operators",
@@ -13064,8 +13151,8 @@
    ],
    "signatures": [
     {
-     "text": "declare operator Operator OR= (Inclusive Disjunction and Assign)= ( byref lhs as T1, byref rhs as T2 )",
-     "label": "Operator OR= (Inclusive Disjunction and Assign)(lhs, rhs)",
+     "text": "declare operator Operator OR== ( byref lhs as T1, byref rhs as T2 )",
+     "label": "Operator OR=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13085,10 +13172,10 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpCombineOr",
    "page": "KeyPgOpCombineOr",
-   "id": "operator or= (inclusive disjunction and assign)|keyword"
+   "id": "operator or=|keyword"
   },
   {
-   "name": "Operator Shl= (Shift left and Assign)",
+   "name": "Operator Shl=",
    "title": "Operator Shl= (Shift left and Assign)",
    "kind": "keyword",
    "category": "Assignment Operators",
@@ -13098,8 +13185,8 @@
    ],
    "signatures": [
     {
-     "text": "declare operator Operator Shl= (Shift left and Assign)= ( byref lhs as integer, byref rhs as integer )",
-     "label": "Operator Shl= (Shift left and Assign)(lhs, rhs)",
+     "text": "declare operator Operator Shl== ( byref lhs as integer, byref rhs as integer )",
+     "label": "Operator Shl=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13114,8 +13201,8 @@
      ]
     },
     {
-     "text": "declare operator Operator Shl= (Shift left and Assign)= ( byref lhs as uinteger, byref rhs as uinteger )",
-     "label": "Operator Shl= (Shift left and Assign)(lhs, rhs)",
+     "text": "declare operator Operator Shl== ( byref lhs as uinteger, byref rhs as uinteger )",
+     "label": "Operator Shl=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13130,8 +13217,8 @@
      ]
     },
     {
-     "text": "declare operator Operator Shl= (Shift left and Assign)= ( byref lhs as longint, byref rhs as longint )",
-     "label": "Operator Shl= (Shift left and Assign)(lhs, rhs)",
+     "text": "declare operator Operator Shl== ( byref lhs as longint, byref rhs as longint )",
+     "label": "Operator Shl=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13146,8 +13233,8 @@
      ]
     },
     {
-     "text": "declare operator Operator Shl= (Shift left and Assign)= ( byref lhs as ulongint, byref rhs as ulongint )",
-     "label": "Operator Shl= (Shift left and Assign)(lhs, rhs)",
+     "text": "declare operator Operator Shl== ( byref lhs as ulongint, byref rhs as ulongint )",
+     "label": "Operator Shl=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13167,10 +13254,10 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpCombineShiftLeft",
    "page": "KeyPgOpCombineShiftLeft",
-   "id": "operator shl= (shift left and assign)|keyword"
+   "id": "operator shl=|keyword"
   },
   {
-   "name": "Operator Shr= (Shift right and Assign)",
+   "name": "Operator Shr=",
    "title": "Operator Shr= (Shift right and Assign)",
    "kind": "keyword",
    "category": "Assignment Operators",
@@ -13180,8 +13267,8 @@
    ],
    "signatures": [
     {
-     "text": "declare operator Operator Shr= (Shift right and Assign)= ( byref lhs as integer, byref rhs as integer )",
-     "label": "Operator Shr= (Shift right and Assign)(lhs, rhs)",
+     "text": "declare operator Operator Shr== ( byref lhs as integer, byref rhs as integer )",
+     "label": "Operator Shr=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13196,8 +13283,8 @@
      ]
     },
     {
-     "text": "declare operator Operator Shr= (Shift right and Assign)= ( byref lhs as uinteger, byref rhs as uinteger )",
-     "label": "Operator Shr= (Shift right and Assign)(lhs, rhs)",
+     "text": "declare operator Operator Shr== ( byref lhs as uinteger, byref rhs as uinteger )",
+     "label": "Operator Shr=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13212,8 +13299,8 @@
      ]
     },
     {
-     "text": "declare operator Operator Shr= (Shift right and Assign)= ( byref lhs as longint, byref rhs as longint )",
-     "label": "Operator Shr= (Shift right and Assign)(lhs, rhs)",
+     "text": "declare operator Operator Shr== ( byref lhs as longint, byref rhs as longint )",
+     "label": "Operator Shr=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13228,8 +13315,8 @@
      ]
     },
     {
-     "text": "declare operator Operator Shr= (Shift right and Assign)= ( byref lhs as ulongint, byref rhs as ulongint )",
-     "label": "Operator Shr= (Shift right and Assign)(lhs, rhs)",
+     "text": "declare operator Operator Shr== ( byref lhs as ulongint, byref rhs as ulongint )",
+     "label": "Operator Shr=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13249,10 +13336,10 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpCombineShiftRight",
    "page": "KeyPgOpCombineShiftRight",
-   "id": "operator shr= (shift right and assign)|keyword"
+   "id": "operator shr=|keyword"
   },
   {
-   "name": "Operator -= (Subtract and Assign)",
+   "name": "Operator -=",
    "title": "Operator -= (Subtract and Assign)",
    "kind": "keyword",
    "category": "Assignment Operators",
@@ -13263,7 +13350,7 @@
    "signatures": [
     {
      "text": "declare operator -= ( byref lhs as T1, byref rhs as T2 )",
-     "label": "Operator -= (Subtract and Assign)(lhs, rhs)",
+     "label": "Operator -=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13279,7 +13366,7 @@
     },
     {
      "text": "declare operator -= ( byref lhs as T ptr, byref rhs as integer )",
-     "label": "Operator -= (Subtract and Assign)(lhs, rhs)",
+     "label": "Operator -=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13299,10 +13386,10 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpCombineSub",
    "page": "KeyPgOpCombineSub",
-   "id": "operator -= (subtract and assign)|keyword"
+   "id": "operator -=|keyword"
   },
   {
-   "name": "Operator XOR= (Exclusive Disjunction and Assign)",
+   "name": "Operator XOR=",
    "title": "Operator XOR= (Exclusive Disjunction and Assign)",
    "kind": "keyword",
    "category": "Assignment Operators",
@@ -13312,8 +13399,8 @@
    ],
    "signatures": [
     {
-     "text": "declare operator Operator XOR= (Exclusive Disjunction and Assign)= ( byref lhs as T1, byref rhs as T2 )",
-     "label": "Operator XOR= (Exclusive Disjunction and Assign)(lhs, rhs)",
+     "text": "declare operator Operator XOR== ( byref lhs as T1, byref rhs as T2 )",
+     "label": "Operator XOR=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13333,10 +13420,10 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpCombineXor",
    "page": "KeyPgOpCombineXor",
-   "id": "operator xor= (exclusive disjunction and assign)|keyword"
+   "id": "operator xor=|keyword"
   },
   {
-   "name": "Operator + (String concatenation)",
+   "name": "Operator +",
    "title": "Operator + (String concatenation)",
    "kind": "keyword",
    "category": "String Operators",
@@ -13347,7 +13434,7 @@
    "signatures": [
     {
      "text": "declare operator + ( byref lhs as string, byref rhs as string ) as string",
-     "label": "Operator + (String concatenation)(lhs, rhs)",
+     "label": "Operator +(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13363,7 +13450,7 @@
     },
     {
      "text": "declare operator + ( byref lhs as zstring, byref rhs as zstring ) as zstring",
-     "label": "Operator + (String concatenation)(lhs, rhs)",
+     "label": "Operator +(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13379,7 +13466,7 @@
     },
     {
      "text": "declare operator + ( byref lhs as wstring, byref rhs as wstring ) as wstring",
-     "label": "Operator + (String concatenation)(lhs, rhs)",
+     "label": "Operator +(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13397,10 +13484,10 @@
    "dialect": [],
    "url": "https://www.freebasic.net/wiki/KeyPgOpConcat",
    "page": "KeyPgOpConcat",
-   "id": "operator + (string concatenation)|keyword"
+   "id": "operator +|keyword#KeyPgOpConcat"
   },
   {
-   "name": "Operator & (String concatenation with conversion)",
+   "name": "Operator &",
    "title": "Operator & (String concatenation with conversion)",
    "kind": "keyword",
    "category": "String Operators",
@@ -13411,7 +13498,7 @@
    "signatures": [
     {
      "text": "declare operator & ( byref lhs as T, byref rhs as U ) as V",
-     "label": "Operator & (String concatenation with conversion)(lhs, rhs)",
+     "label": "Operator &(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13429,7 +13516,7 @@
    "dialect": [],
    "url": "https://www.freebasic.net/wiki/KeyPgOpConcatConvert",
    "page": "KeyPgOpConcatConvert",
-   "id": "operator & (string concatenation with conversion)|keyword"
+   "id": "operator &|keyword"
   },
   {
    "name": "Operator Delete Statement",
@@ -13489,7 +13576,7 @@
    "id": "delete|keyword"
   },
   {
-   "name": "Operator / (Divide)",
+   "name": "Operator /",
    "title": "Operator / (Divide)",
    "kind": "keyword",
    "category": "Arithmetic Operators",
@@ -13500,7 +13587,7 @@
    "signatures": [
     {
      "text": "declare operator / ( byref lhs as single, byref rhs as single ) as single",
-     "label": "Operator / (Divide)(lhs, rhs)",
+     "label": "Operator /(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13516,7 +13603,7 @@
     },
     {
      "text": "declare operator / ( byref lhs as double, byref rhs as double ) as double",
-     "label": "Operator / (Divide)(lhs, rhs)",
+     "label": "Operator /(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13536,10 +13623,10 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpDivide",
    "page": "KeyPgOpDivide",
-   "id": "operator / (divide)|keyword"
+   "id": "operator /|keyword"
   },
   {
-   "name": "Operator = (Equal)",
+   "name": "Operator =",
    "title": "Operator = (Equal)",
    "kind": "keyword",
    "category": "Relational Operators",
@@ -13550,7 +13637,7 @@
    "signatures": [
     {
      "text": "declare operator = ( byref lhs as byte, byref rhs as byte ) as integer",
-     "label": "Operator = (Equal)(lhs, rhs)",
+     "label": "Operator =(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13566,7 +13653,7 @@
     },
     {
      "text": "declare operator = ( byref lhs as ubyte, byref rhs as ubyte ) as integer",
-     "label": "Operator = (Equal)(lhs, rhs)",
+     "label": "Operator =(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13582,7 +13669,7 @@
     },
     {
      "text": "declare operator = ( byref lhs as short, byref rhs as short ) as integer",
-     "label": "Operator = (Equal)(lhs, rhs)",
+     "label": "Operator =(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13598,7 +13685,7 @@
     },
     {
      "text": "declare operator = ( byref lhs as ushort, byref rhs as ushort ) as integer",
-     "label": "Operator = (Equal)(lhs, rhs)",
+     "label": "Operator =(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13614,7 +13701,7 @@
     },
     {
      "text": "declare operator = ( byref lhs as integer, byref rhs as integer ) as integer",
-     "label": "Operator = (Equal)(lhs, rhs)",
+     "label": "Operator =(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13630,7 +13717,7 @@
     },
     {
      "text": "declare operator = ( byref lhs as uinteger, byref rhs as uinteger ) as integer",
-     "label": "Operator = (Equal)(lhs, rhs)",
+     "label": "Operator =(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13646,7 +13733,7 @@
     },
     {
      "text": "declare operator = ( byref lhs as longint, byref rhs as longint ) as integer",
-     "label": "Operator = (Equal)(lhs, rhs)",
+     "label": "Operator =(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13662,7 +13749,7 @@
     },
     {
      "text": "declare operator = ( byref lhs as ulongint, byref rhs as ulongint ) as integer",
-     "label": "Operator = (Equal)(lhs, rhs)",
+     "label": "Operator =(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13678,7 +13765,7 @@
     },
     {
      "text": "declare operator = ( byref lhs as single, byref rhs as single ) as integer",
-     "label": "Operator = (Equal)(lhs, rhs)",
+     "label": "Operator =(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13694,7 +13781,7 @@
     },
     {
      "text": "declare operator = ( byref lhs as double, byref rhs as double ) as integer",
-     "label": "Operator = (Equal)(lhs, rhs)",
+     "label": "Operator =(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13710,7 +13797,7 @@
     },
     {
      "text": "declare operator = ( byref lhs as string, byref rhs as string ) as integer",
-     "label": "Operator = (Equal)(lhs, rhs)",
+     "label": "Operator =(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13726,7 +13813,7 @@
     },
     {
      "text": "declare operator = ( byref lhs as zstring, byref rhs as zstring ) as integer",
-     "label": "Operator = (Equal)(lhs, rhs)",
+     "label": "Operator =(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13742,7 +13829,7 @@
     },
     {
      "text": "declare operator = ( byref lhs as wstring, byref rhs as wstring ) as integer",
-     "label": "Operator = (Equal)(lhs, rhs)",
+     "label": "Operator =(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13758,7 +13845,7 @@
     },
     {
      "text": "declare operator = ( byref lhs as T, byref rhs as T ) as integer",
-     "label": "Operator = (Equal)(lhs, rhs)",
+     "label": "Operator =(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13774,7 +13861,7 @@
     },
     {
      "text": "declare operator = ( byref lhs as boolean, byref rhs as boolean ) as boolean",
-     "label": "Operator = (Equal)(lhs, rhs)",
+     "label": "Operator =(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13794,7 +13881,7 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpEqual",
    "page": "KeyPgOpEqual",
-   "id": "operator = (equal)|keyword"
+   "id": "operator =|keyword"
   },
   {
    "name": "Eqv",
@@ -13831,7 +13918,7 @@
    "id": "eqv|keyword"
   },
   {
-   "name": "Operator ^ (Exponentiate)",
+   "name": "Operator ^",
    "title": "Operator ^ (Exponentiate)",
    "kind": "keyword",
    "category": "Arithmetic Operators",
@@ -13842,7 +13929,7 @@
    "signatures": [
     {
      "text": "declare operator ^ ( byref lhs as double, byref rhs as double ) as double",
-     "label": "Operator ^ (Exponentiate)(lhs, rhs)",
+     "label": "Operator ^(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13862,7 +13949,7 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpExponentiate",
    "page": "KeyPgOpExponentiate",
-   "id": "operator ^ (exponentiate)|keyword"
+   "id": "operator ^|keyword"
   },
   {
    "name": "For",
@@ -13916,7 +14003,7 @@
    "id": "for|keyword#KeyPgOpFor"
   },
   {
-   "name": "Operator > (Greater than)",
+   "name": "Operator >",
    "title": "Operator > (Greater than)",
    "kind": "keyword",
    "category": "Relational Operators",
@@ -13927,7 +14014,7 @@
    "signatures": [
     {
      "text": "declare operator > ( byref lhs as byte, byref rhs as byte ) as integer",
-     "label": "Operator > (Greater than)(lhs, rhs)",
+     "label": "Operator >(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13943,7 +14030,7 @@
     },
     {
      "text": "declare operator > ( byref lhs as ubyte, byref rhs as ubyte ) as integer",
-     "label": "Operator > (Greater than)(lhs, rhs)",
+     "label": "Operator >(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13959,7 +14046,7 @@
     },
     {
      "text": "declare operator > ( byref lhs as short, byref rhs as short ) as integer",
-     "label": "Operator > (Greater than)(lhs, rhs)",
+     "label": "Operator >(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13975,7 +14062,7 @@
     },
     {
      "text": "declare operator > ( byref lhs as ushort, byref rhs as ushort ) as integer",
-     "label": "Operator > (Greater than)(lhs, rhs)",
+     "label": "Operator >(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -13991,7 +14078,7 @@
     },
     {
      "text": "declare operator > ( byref lhs as integer, byref rhs as integer ) as integer",
-     "label": "Operator > (Greater than)(lhs, rhs)",
+     "label": "Operator >(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14007,7 +14094,7 @@
     },
     {
      "text": "declare operator > ( byref lhs as uinteger, byref rhs as uinteger ) as integer",
-     "label": "Operator > (Greater than)(lhs, rhs)",
+     "label": "Operator >(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14023,7 +14110,7 @@
     },
     {
      "text": "declare operator > ( byref lhs as longint, byref rhs as longint ) as integer",
-     "label": "Operator > (Greater than)(lhs, rhs)",
+     "label": "Operator >(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14039,7 +14126,7 @@
     },
     {
      "text": "declare operator > ( byref lhs as ulongint, byref rhs as ulongint ) as integer",
-     "label": "Operator > (Greater than)(lhs, rhs)",
+     "label": "Operator >(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14055,7 +14142,7 @@
     },
     {
      "text": "declare operator > ( byref lhs as single, byref rhs as single ) as integer",
-     "label": "Operator > (Greater than)(lhs, rhs)",
+     "label": "Operator >(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14071,7 +14158,7 @@
     },
     {
      "text": "declare operator > ( byref lhs as double, byref rhs as double ) as integer",
-     "label": "Operator > (Greater than)(lhs, rhs)",
+     "label": "Operator >(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14087,7 +14174,7 @@
     },
     {
      "text": "declare operator > ( byref lhs as string, byref rhs as string ) as integer",
-     "label": "Operator > (Greater than)(lhs, rhs)",
+     "label": "Operator >(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14103,7 +14190,7 @@
     },
     {
      "text": "declare operator > ( byref lhs as zstring, byref rhs as zstring ) as integer",
-     "label": "Operator > (Greater than)(lhs, rhs)",
+     "label": "Operator >(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14119,7 +14206,7 @@
     },
     {
      "text": "declare operator > ( byref lhs as wstring, byref rhs as wstring ) as integer",
-     "label": "Operator > (Greater than)(lhs, rhs)",
+     "label": "Operator >(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14135,7 +14222,7 @@
     },
     {
      "text": "declare operator > ( byref lhs as T, byref rhs as T ) as integer",
-     "label": "Operator > (Greater than)(lhs, rhs)",
+     "label": "Operator >(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14155,10 +14242,10 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpGreaterThan",
    "page": "KeyPgOpGreaterThan",
-   "id": "operator > (greater than)|keyword"
+   "id": "operator >|keyword"
   },
   {
-   "name": "Operator >= (Greater than or Equal)",
+   "name": "Operator >=",
    "title": "Operator >= (Greater than or Equal)",
    "kind": "keyword",
    "category": "Relational Operators",
@@ -14169,7 +14256,7 @@
    "signatures": [
     {
      "text": "declare operator >= ( byref lhs as byte, byref rhs as byte ) as integer",
-     "label": "Operator >= (Greater than or Equal)(lhs, rhs)",
+     "label": "Operator >=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14185,7 +14272,7 @@
     },
     {
      "text": "declare operator >= ( byref lhs as ubyte, byref rhs as ubyte ) as integer",
-     "label": "Operator >= (Greater than or Equal)(lhs, rhs)",
+     "label": "Operator >=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14201,7 +14288,7 @@
     },
     {
      "text": "declare operator >= ( byref lhs as short, byref rhs as short ) as integer",
-     "label": "Operator >= (Greater than or Equal)(lhs, rhs)",
+     "label": "Operator >=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14217,7 +14304,7 @@
     },
     {
      "text": "declare operator >= ( byref lhs as ushort, byref rhs as ushort ) as integer",
-     "label": "Operator >= (Greater than or Equal)(lhs, rhs)",
+     "label": "Operator >=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14233,7 +14320,7 @@
     },
     {
      "text": "declare operator >= ( byref lhs as integer, byref rhs as integer ) as integer",
-     "label": "Operator >= (Greater than or Equal)(lhs, rhs)",
+     "label": "Operator >=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14249,7 +14336,7 @@
     },
     {
      "text": "declare operator >= ( byref lhs as uinteger, byref rhs as uinteger ) as integer",
-     "label": "Operator >= (Greater than or Equal)(lhs, rhs)",
+     "label": "Operator >=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14265,7 +14352,7 @@
     },
     {
      "text": "declare operator >= ( byref lhs as longint, byref rhs as longint ) as integer",
-     "label": "Operator >= (Greater than or Equal)(lhs, rhs)",
+     "label": "Operator >=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14281,7 +14368,7 @@
     },
     {
      "text": "declare operator >= ( byref lhs as ulongint, byref rhs as ulongint ) as integer",
-     "label": "Operator >= (Greater than or Equal)(lhs, rhs)",
+     "label": "Operator >=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14297,7 +14384,7 @@
     },
     {
      "text": "declare operator >= ( byref lhs as single, byref rhs as single ) as integer",
-     "label": "Operator >= (Greater than or Equal)(lhs, rhs)",
+     "label": "Operator >=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14313,7 +14400,7 @@
     },
     {
      "text": "declare operator >= ( byref lhs as double, byref rhs as double ) as integer",
-     "label": "Operator >= (Greater than or Equal)(lhs, rhs)",
+     "label": "Operator >=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14329,7 +14416,7 @@
     },
     {
      "text": "declare operator >= ( byref lhs as string, byref rhs as string ) as integer",
-     "label": "Operator >= (Greater than or Equal)(lhs, rhs)",
+     "label": "Operator >=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14345,7 +14432,7 @@
     },
     {
      "text": "declare operator >= ( byref lhs as zstring, byref rhs as zstring ) as integer",
-     "label": "Operator >= (Greater than or Equal)(lhs, rhs)",
+     "label": "Operator >=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14361,7 +14448,7 @@
     },
     {
      "text": "declare operator >= ( byref lhs as wstring, byref rhs as wstring ) as integer",
-     "label": "Operator >= (Greater than or Equal)(lhs, rhs)",
+     "label": "Operator >=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14377,7 +14464,7 @@
     },
     {
      "text": "declare operator >= ( byref lhs as T, byref rhs as T ) as integer",
-     "label": "Operator >= (Greater than or Equal)(lhs, rhs)",
+     "label": "Operator >=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14397,7 +14484,7 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpGreaterThanOrEqual",
    "page": "KeyPgOpGreaterThanOrEqual",
-   "id": "operator >= (greater than or equal)|keyword"
+   "id": "operator >=|keyword"
   },
   {
    "name": "Imp",
@@ -14434,7 +14521,7 @@
    "id": "imp|keyword"
   },
   {
-   "name": "Operator \\ (Integer divide)",
+   "name": "Operator \\",
    "title": "Operator \\ (Integer divide)",
    "kind": "keyword",
    "category": "Arithmetic Operators",
@@ -14445,7 +14532,7 @@
    "signatures": [
     {
      "text": "declare operator \\ ( byref lhs as integer, byref rhs as integer ) as integer",
-     "label": "Operator \\ (Integer divide)(lhs, rhs)",
+     "label": "Operator \\(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14461,7 +14548,7 @@
     },
     {
      "text": "declare operator \\ ( byref lhs as uinteger, byref rhs as uinteger ) as uinteger",
-     "label": "Operator \\ (Integer divide)(lhs, rhs)",
+     "label": "Operator \\(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14481,7 +14568,7 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpIntegerDivide",
    "page": "KeyPgOpIntegerDivide",
-   "id": "operator \\ (integer divide)|keyword"
+   "id": "operator \\|keyword"
   },
   {
    "name": "Is",
@@ -14503,7 +14590,7 @@
    "id": "is|keyword#KeyPgOpIs"
   },
   {
-   "name": "Operator < (Less than)",
+   "name": "Operator <",
    "title": "Operator < (Less than)",
    "kind": "keyword",
    "category": "Relational Operators",
@@ -14514,7 +14601,7 @@
    "signatures": [
     {
      "text": "declare operator < ( byref lhs as byte, byref rhs as byte ) as integer",
-     "label": "Operator < (Less than)(lhs, rhs)",
+     "label": "Operator <(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14530,7 +14617,7 @@
     },
     {
      "text": "declare operator < ( byref lhs as ubyte, byref rhs as ubyte ) as integer",
-     "label": "Operator < (Less than)(lhs, rhs)",
+     "label": "Operator <(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14546,7 +14633,7 @@
     },
     {
      "text": "declare operator < ( byref lhs as short, byref rhs as short ) as integer",
-     "label": "Operator < (Less than)(lhs, rhs)",
+     "label": "Operator <(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14562,7 +14649,7 @@
     },
     {
      "text": "declare operator < ( byref lhs as ushort, byref rhs as ushort ) as integer",
-     "label": "Operator < (Less than)(lhs, rhs)",
+     "label": "Operator <(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14578,7 +14665,7 @@
     },
     {
      "text": "declare operator < ( byref lhs as integer, byref rhs as integer ) as integer",
-     "label": "Operator < (Less than)(lhs, rhs)",
+     "label": "Operator <(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14594,7 +14681,7 @@
     },
     {
      "text": "declare operator < ( byref lhs as uinteger, byref rhs as uinteger ) as integer",
-     "label": "Operator < (Less than)(lhs, rhs)",
+     "label": "Operator <(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14610,7 +14697,7 @@
     },
     {
      "text": "declare operator < ( byref lhs as longint, byref rhs as longint ) as integer",
-     "label": "Operator < (Less than)(lhs, rhs)",
+     "label": "Operator <(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14626,7 +14713,7 @@
     },
     {
      "text": "declare operator < ( byref lhs as ulongint, byref rhs as ulongint ) as integer",
-     "label": "Operator < (Less than)(lhs, rhs)",
+     "label": "Operator <(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14642,7 +14729,7 @@
     },
     {
      "text": "declare operator < ( byref lhs as single, byref rhs as single ) as integer",
-     "label": "Operator < (Less than)(lhs, rhs)",
+     "label": "Operator <(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14658,7 +14745,7 @@
     },
     {
      "text": "declare operator < ( byref lhs as double, byref rhs as double ) as integer",
-     "label": "Operator < (Less than)(lhs, rhs)",
+     "label": "Operator <(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14674,7 +14761,7 @@
     },
     {
      "text": "declare operator < ( byref lhs as string, byref rhs as string ) as integer",
-     "label": "Operator < (Less than)(lhs, rhs)",
+     "label": "Operator <(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14690,7 +14777,7 @@
     },
     {
      "text": "declare operator < ( byref lhs as zstring, byref rhs as zstring ) as integer",
-     "label": "Operator < (Less than)(lhs, rhs)",
+     "label": "Operator <(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14706,7 +14793,7 @@
     },
     {
      "text": "declare operator < ( byref lhs as wstring, byref rhs as wstring ) as integer",
-     "label": "Operator < (Less than)(lhs, rhs)",
+     "label": "Operator <(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14722,7 +14809,7 @@
     },
     {
      "text": "declare operator < ( byref lhs as T, byref rhs as T ) as integer",
-     "label": "Operator < (Less than)(lhs, rhs)",
+     "label": "Operator <(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14742,10 +14829,10 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpLessThan",
    "page": "KeyPgOpLessThan",
-   "id": "operator < (less than)|keyword"
+   "id": "operator <|keyword"
   },
   {
-   "name": "Operator <= (Less than or Equal)",
+   "name": "Operator <=",
    "title": "Operator <= (Less than or Equal)",
    "kind": "keyword",
    "category": "Relational Operators",
@@ -14756,7 +14843,7 @@
    "signatures": [
     {
      "text": "declare operator <= ( byref lhs as byte, byref rhs as byte ) as integer",
-     "label": "Operator <= (Less than or Equal)(lhs, rhs)",
+     "label": "Operator <=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14772,7 +14859,7 @@
     },
     {
      "text": "declare operator <= ( byref lhs as ubyte, byref rhs as ubyte ) as integer",
-     "label": "Operator <= (Less than or Equal)(lhs, rhs)",
+     "label": "Operator <=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14788,7 +14875,7 @@
     },
     {
      "text": "declare operator <= ( byref lhs as short, byref rhs as short ) as integer",
-     "label": "Operator <= (Less than or Equal)(lhs, rhs)",
+     "label": "Operator <=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14804,7 +14891,7 @@
     },
     {
      "text": "declare operator <= ( byref lhs as ushort, byref rhs as ushort ) as integer",
-     "label": "Operator <= (Less than or Equal)(lhs, rhs)",
+     "label": "Operator <=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14820,7 +14907,7 @@
     },
     {
      "text": "declare operator <= ( byref lhs as integer, byref rhs as integer ) as integer",
-     "label": "Operator <= (Less than or Equal)(lhs, rhs)",
+     "label": "Operator <=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14836,7 +14923,7 @@
     },
     {
      "text": "declare operator <= ( byref lhs as uinteger, byref rhs as uinteger ) as integer",
-     "label": "Operator <= (Less than or Equal)(lhs, rhs)",
+     "label": "Operator <=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14852,7 +14939,7 @@
     },
     {
      "text": "declare operator <= ( byref lhs as longint, byref rhs as longint ) as integer",
-     "label": "Operator <= (Less than or Equal)(lhs, rhs)",
+     "label": "Operator <=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14868,7 +14955,7 @@
     },
     {
      "text": "declare operator <= ( byref lhs as ulongint, byref rhs as ulongint ) as integer",
-     "label": "Operator <= (Less than or Equal)(lhs, rhs)",
+     "label": "Operator <=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14884,7 +14971,7 @@
     },
     {
      "text": "declare operator <= ( byref lhs as single, byref rhs as single ) as integer",
-     "label": "Operator <= (Less than or Equal)(lhs, rhs)",
+     "label": "Operator <=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14900,7 +14987,7 @@
     },
     {
      "text": "declare operator <= ( byref lhs as double, byref rhs as double ) as integer",
-     "label": "Operator <= (Less than or Equal)(lhs, rhs)",
+     "label": "Operator <=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14916,7 +15003,7 @@
     },
     {
      "text": "declare operator <= ( byref lhs as string, byref rhs as string ) as integer",
-     "label": "Operator <= (Less than or Equal)(lhs, rhs)",
+     "label": "Operator <=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14932,7 +15019,7 @@
     },
     {
      "text": "declare operator <= ( byref lhs as zstring, byref rhs as zstring ) as integer",
-     "label": "Operator <= (Less than or Equal)(lhs, rhs)",
+     "label": "Operator <=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14948,7 +15035,7 @@
     },
     {
      "text": "declare operator <= ( byref lhs as wstring, byref rhs as wstring ) as integer",
-     "label": "Operator <= (Less than or Equal)(lhs, rhs)",
+     "label": "Operator <=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14964,7 +15051,7 @@
     },
     {
      "text": "declare operator <= ( byref lhs as T, byref rhs as T ) as integer",
-     "label": "Operator <= (Less than or Equal)(lhs, rhs)",
+     "label": "Operator <=(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -14984,7 +15071,7 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpLessThanOrEqual",
    "page": "KeyPgOpLessThanOrEqual",
-   "id": "operator <= (less than or equal)|keyword"
+   "id": "operator <=|keyword"
   },
   {
    "name": "Let",
@@ -15083,7 +15170,7 @@
    "id": "let|keyword#KeyPgOpLetlist"
   },
   {
-   "name": "Operator . (Member access)",
+   "name": "Operator .",
    "title": "Operator . (Member access)",
    "kind": "keyword",
    "category": "Type or Class Operators",
@@ -15094,7 +15181,7 @@
    "signatures": [
     {
      "text": "Declare Operator . ( Byref lhs As T ) Byref As U",
-     "label": "Operator . (Member access)(lhs)",
+     "label": "Operator .(lhs)",
      "params": [
       {
        "mode": "byref",
@@ -15109,7 +15196,7 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpMemberAccess",
    "page": "KeyPgOpMemberAccess",
-   "id": "operator . (member access)|keyword"
+   "id": "operator .|keyword"
   },
   {
    "name": "Mod",
@@ -15146,7 +15233,7 @@
    "id": "mod|keyword"
   },
   {
-   "name": "Operator * (Multiply)",
+   "name": "Operator *",
    "title": "Operator * (Multiply)",
    "kind": "keyword",
    "category": "Arithmetic Operators",
@@ -15157,7 +15244,7 @@
    "signatures": [
     {
      "text": "declare operator * ( byref lhs as integer, byref rhs as integer ) as integer",
-     "label": "Operator * (Multiply)(lhs, rhs)",
+     "label": "Operator *(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -15173,7 +15260,7 @@
     },
     {
      "text": "declare operator * ( byref lhs as uinteger, byref rhs as uinteger ) as uinteger",
-     "label": "Operator * (Multiply)(lhs, rhs)",
+     "label": "Operator *(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -15189,7 +15276,7 @@
     },
     {
      "text": "declare operator * ( byref lhs as single, byref rhs as single ) as single",
-     "label": "Operator * (Multiply)(lhs, rhs)",
+     "label": "Operator *(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -15205,7 +15292,7 @@
     },
     {
      "text": "declare operator * ( byref lhs as double, byref rhs as double ) as double",
-     "label": "Operator * (Multiply)(lhs, rhs)",
+     "label": "Operator *(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -15225,10 +15312,10 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpMultiply",
    "page": "KeyPgOpMultiply",
-   "id": "operator * (multiply)|keyword"
+   "id": "operator *|keyword"
   },
   {
-   "name": "Operator - (Negate)",
+   "name": "Operator -",
    "title": "Operator - (Negate)",
    "kind": "keyword",
    "category": "Arithmetic Operators",
@@ -15239,7 +15326,7 @@
    "signatures": [
     {
      "text": "declare operator - ( byref rhs as integer ) as integer",
-     "label": "Operator - (Negate)(rhs)",
+     "label": "Operator -(rhs)",
      "params": [
       {
        "mode": "byref",
@@ -15250,7 +15337,7 @@
     },
     {
      "text": "declare operator - ( byref rhs as single ) as single",
-     "label": "Operator - (Negate)(rhs)",
+     "label": "Operator -(rhs)",
      "params": [
       {
        "mode": "byref",
@@ -15261,7 +15348,7 @@
     },
     {
      "text": "declare operator - ( byref rhs as double ) as double",
-     "label": "Operator - (Negate)(rhs)",
+     "label": "Operator -(rhs)",
      "params": [
       {
        "mode": "byref",
@@ -15276,7 +15363,7 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpNegate",
    "page": "KeyPgOpNegate",
-   "id": "operator - (negate)|keyword"
+   "id": "operator -|keyword"
   },
   {
    "name": "Operator New Expression",
@@ -15473,7 +15560,7 @@
    "id": "not|keyword"
   },
   {
-   "name": "Operator <> (Not equal)",
+   "name": "Operator <>",
    "title": "Operator <> (Not equal)",
    "kind": "keyword",
    "category": "Relational Operators",
@@ -15484,7 +15571,7 @@
    "signatures": [
     {
      "text": "declare operator <> ( byref lhs as byte, byref rhs as byte ) as integer",
-     "label": "Operator <> (Not equal)(lhs, rhs)",
+     "label": "Operator <>(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -15500,7 +15587,7 @@
     },
     {
      "text": "declare operator <> ( byref lhs as ubyte, byref rhs as ubyte ) as integer",
-     "label": "Operator <> (Not equal)(lhs, rhs)",
+     "label": "Operator <>(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -15516,7 +15603,7 @@
     },
     {
      "text": "declare operator <> ( byref lhs as short, byref rhs as short ) as integer",
-     "label": "Operator <> (Not equal)(lhs, rhs)",
+     "label": "Operator <>(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -15532,7 +15619,7 @@
     },
     {
      "text": "declare operator <> ( byref lhs as ushort, byref rhs as ushort ) as integer",
-     "label": "Operator <> (Not equal)(lhs, rhs)",
+     "label": "Operator <>(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -15548,7 +15635,7 @@
     },
     {
      "text": "declare operator <> ( byref lhs as integer, byref rhs as integer ) as integer",
-     "label": "Operator <> (Not equal)(lhs, rhs)",
+     "label": "Operator <>(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -15564,7 +15651,7 @@
     },
     {
      "text": "declare operator <> ( byref lhs as uinteger, byref rhs as uinteger ) as integer",
-     "label": "Operator <> (Not equal)(lhs, rhs)",
+     "label": "Operator <>(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -15580,7 +15667,7 @@
     },
     {
      "text": "declare operator <> ( byref lhs as longint, byref rhs as longint ) as integer",
-     "label": "Operator <> (Not equal)(lhs, rhs)",
+     "label": "Operator <>(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -15596,7 +15683,7 @@
     },
     {
      "text": "declare operator <> ( byref lhs as ulongint, byref rhs as ulongint ) as integer",
-     "label": "Operator <> (Not equal)(lhs, rhs)",
+     "label": "Operator <>(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -15612,7 +15699,7 @@
     },
     {
      "text": "declare operator <> ( byref lhs as single, byref rhs as single ) as integer",
-     "label": "Operator <> (Not equal)(lhs, rhs)",
+     "label": "Operator <>(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -15628,7 +15715,7 @@
     },
     {
      "text": "declare operator <> ( byref lhs as double, byref rhs as double ) as integer",
-     "label": "Operator <> (Not equal)(lhs, rhs)",
+     "label": "Operator <>(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -15644,7 +15731,7 @@
     },
     {
      "text": "declare operator <> ( byref lhs as string, byref rhs as string ) as integer",
-     "label": "Operator <> (Not equal)(lhs, rhs)",
+     "label": "Operator <>(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -15660,7 +15747,7 @@
     },
     {
      "text": "declare operator <> ( byref lhs as zstring, byref rhs as zstring ) as integer",
-     "label": "Operator <> (Not equal)(lhs, rhs)",
+     "label": "Operator <>(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -15676,7 +15763,7 @@
     },
     {
      "text": "declare operator <> ( byref lhs as wstring, byref rhs as wstring ) as integer",
-     "label": "Operator <> (Not equal)(lhs, rhs)",
+     "label": "Operator <>(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -15692,7 +15779,7 @@
     },
     {
      "text": "declare operator <> ( byref lhs as T, byref rhs as T ) as integer",
-     "label": "Operator <> (Not equal)(lhs, rhs)",
+     "label": "Operator <>(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -15708,7 +15795,7 @@
     },
     {
      "text": "declare operator <> ( byref lhs as boolean, byref rhs as boolean ) as boolean",
-     "label": "Operator <> (Not equal)(lhs, rhs)",
+     "label": "Operator <>(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -15728,7 +15815,7 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpNotEqual",
    "page": "KeyPgOpNotEqual",
-   "id": "operator <> (not equal)|keyword"
+   "id": "operator <>|keyword"
   },
   {
    "name": "Or",
@@ -15765,7 +15852,7 @@
    "id": "or|keyword"
   },
   {
-   "name": "Operator ORELSE (Short Circuit Inclusive Disjunction)",
+   "name": "Operator ORELSE",
    "title": "Operator ORELSE (Short Circuit Inclusive Disjunction)",
    "kind": "keyword",
    "category": "Short Circuit Operators",
@@ -15776,7 +15863,7 @@
    "signatures": [
     {
      "text": "declare operator \"\"OrElse\"\" ( byref lhs as T1, byref rhs as T2 ) as Ret",
-     "label": "Operator ORELSE (Short Circuit Inclusive Disjunction)(lhs, rhs)",
+     "label": "Operator ORELSE(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -15794,7 +15881,7 @@
    "dialect": [],
    "url": "https://www.freebasic.net/wiki/KeyPgOpOrElse",
    "page": "KeyPgOpOrElse",
-   "id": "operator orelse (short circuit inclusive disjunction)|keyword"
+   "id": "operator orelse|keyword"
   },
   {
    "name": "Operator Placement New",
@@ -15861,7 +15948,7 @@
    "id": "operator placement new|keyword"
   },
   {
-   "name": "Operator ## (Preprocessor Concatenate)",
+   "name": "Operator ##",
    "title": "Operator ## (Preprocessor Concatenate)",
    "kind": "keyword",
    "category": "Preprocessor Operators",
@@ -15870,17 +15957,17 @@
    "signatures": [
     {
      "text": "text\"\"##\"\"text",
-     "label": "Operator ## (Preprocessor Concatenate)()",
+     "label": "Operator ##()",
      "params": []
     }
    ],
    "dialect": [],
    "url": "https://www.freebasic.net/wiki/KeyPgOpPpConcat",
    "page": "KeyPgOpPpConcat",
-   "id": "operator ## (preprocessor concatenate)|keyword"
+   "id": "operator ##|keyword"
   },
   {
-   "name": "Operator ! (Escaped String Literal)",
+   "name": "Operator !",
    "title": "Operator ! (Escaped String Literal)",
    "kind": "keyword",
    "category": "Preprocessor Operators",
@@ -15889,17 +15976,17 @@
    "signatures": [
     {
      "text": "!\"text\"",
-     "label": "Operator ! (Escaped String Literal)()",
+     "label": "Operator !()",
      "params": []
     }
    ],
    "dialect": [],
    "url": "https://www.freebasic.net/wiki/KeyPgOpPpEscape",
    "page": "KeyPgOpPpEscape",
-   "id": "operator ! (escaped string literal)|keyword"
+   "id": "operator !|keyword"
   },
   {
-   "name": "Operator $ (Non-Escaped String Literal)",
+   "name": "Operator $",
    "title": "Operator $ (Non-Escaped String Literal)",
    "kind": "keyword",
    "category": "Preprocessor Operators",
@@ -15908,17 +15995,17 @@
    "signatures": [
     {
      "text": "$\"text\"",
-     "label": "Operator $ (Non-Escaped String Literal)()",
+     "label": "Operator $()",
      "params": []
     }
    ],
    "dialect": [],
    "url": "https://www.freebasic.net/wiki/KeyPgOpPpNoescape",
    "page": "KeyPgOpPpNoescape",
-   "id": "operator $ (non-escaped string literal)|keyword"
+   "id": "operator $|keyword"
   },
   {
-   "name": "Operator # (Preprocessor Stringize)",
+   "name": "Operator #",
    "title": "Operator # (Preprocessor Stringize)",
    "kind": "keyword",
    "category": "Preprocessor Operators",
@@ -15927,14 +16014,14 @@
    "signatures": [
     {
      "text": "\"\"#\"\"macro_argument",
-     "label": "Operator # (Preprocessor Stringize)()",
+     "label": "Operator #()",
      "params": []
     }
    ],
    "dialect": [],
    "url": "https://www.freebasic.net/wiki/KeyPgOpPpStringize",
    "page": "KeyPgOpPpStringize",
-   "id": "operator # (preprocessor stringize)|keyword"
+   "id": "operator #|keyword"
   },
   {
    "name": "ProcPtr",
@@ -15982,7 +16069,7 @@
    "id": "procptr|keyword"
   },
   {
-   "name": "Operator [] (Pointer index)",
+   "name": "Operator []",
    "title": "Operator [] (Pointer index)",
    "kind": "keyword",
    "category": "Indexing Operators",
@@ -15995,7 +16082,7 @@
    "signatures": [
     {
      "text": "declare operator [] ( byref lhs as T pointer, byref rhs as integer ) byref as T",
-     "label": "Operator [] (Pointer index)(lhs, rhs)",
+     "label": "Operator [](lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -16013,10 +16100,10 @@
    "dialect": [],
    "url": "https://www.freebasic.net/wiki/KeyPgOpPtrIndex",
    "page": "KeyPgOpPtrIndex",
-   "id": "operator [] (pointer index)|keyword"
+   "id": "operator []|keyword"
   },
   {
-   "name": "Operator -> (Pointer to member access)",
+   "name": "Operator ->",
    "title": "Operator -> (Pointer to member access)",
    "kind": "keyword",
    "category": "Type or Class Operators",
@@ -16027,7 +16114,7 @@
    "signatures": [
     {
      "text": "Declare Operator -> ( Byref lhs As T Ptr ) Byref As U",
-     "label": "Operator -> (Pointer to member access)(lhs)",
+     "label": "Operator ->(lhs)",
      "params": [
       {
        "mode": "byref",
@@ -16042,7 +16129,7 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpPtrMemberAccess",
    "page": "KeyPgOpPtrMemberAccess",
-   "id": "operator -> (pointer to member access)|keyword"
+   "id": "operator ->|keyword"
   },
   {
    "name": "Shl",
@@ -16260,7 +16347,7 @@
    "id": "step|keyword"
   },
   {
-   "name": "Operator [] (String index)",
+   "name": "Operator []",
    "title": "Operator [] (String index)",
    "kind": "keyword",
    "category": "Indexing Operators",
@@ -16273,7 +16360,7 @@
    "signatures": [
     {
      "text": "declare operator [] ( byref lhs as string, byref rhs as integer ) byref as ubyte",
-     "label": "Operator [] (String index)(lhs, rhs)",
+     "label": "Operator [](lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -16289,7 +16376,7 @@
     },
     {
      "text": "declare operator [] ( byref lhs as zstring, byref rhs as integer ) byref as ubyte",
-     "label": "Operator [] (String index)(lhs, rhs)",
+     "label": "Operator [](lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -16305,7 +16392,7 @@
     },
     {
      "text": "declare operator [] ( byref lhs as wstring, byref rhs as integer ) byref as T",
-     "label": "Operator [] (String index)(lhs, rhs)",
+     "label": "Operator [](lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -16323,7 +16410,7 @@
    "dialect": [],
    "url": "https://www.freebasic.net/wiki/KeyPgOpStringIndex",
    "page": "KeyPgOpStringIndex",
-   "id": "operator [] (string index)|keyword"
+   "id": "operator []|keyword#KeyPgOpStringIndex"
   },
   {
    "name": "StrPtr",
@@ -16364,7 +16451,7 @@
    "id": "strptr|keyword"
   },
   {
-   "name": "Operator - (Subtract)",
+   "name": "Operator -",
    "title": "Operator - (Subtract)",
    "kind": "keyword",
    "category": "Arithmetic Operators",
@@ -16375,7 +16462,7 @@
    "signatures": [
     {
      "text": "declare operator - ( byref lhs as integer, byref rhs as integer ) as integer",
-     "label": "Operator - (Subtract)(lhs, rhs)",
+     "label": "Operator -(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -16391,7 +16478,7 @@
     },
     {
      "text": "declare operator - ( byref lhs as uinteger, byref rhs as uinteger ) as uinteger",
-     "label": "Operator - (Subtract)(lhs, rhs)",
+     "label": "Operator -(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -16407,7 +16494,7 @@
     },
     {
      "text": "declare operator - ( byref lhs as single, byref rhs as single ) as single",
-     "label": "Operator - (Subtract)(lhs, rhs)",
+     "label": "Operator -(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -16423,7 +16510,7 @@
     },
     {
      "text": "declare operator - ( byref lhs as double, byref rhs as double ) as double",
-     "label": "Operator - (Subtract)(lhs, rhs)",
+     "label": "Operator -(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -16439,7 +16526,7 @@
     },
     {
      "text": "declare operator - ( byref lhs as T Pointer, byref rhs as T Pointer ) as integer",
-     "label": "Operator - (Subtract)(lhs, rhs)",
+     "label": "Operator -(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -16455,7 +16542,7 @@
     },
     {
      "text": "declare operator - ( byref lhs as T Pointer, byref rhs as integer ) as T Pointer",
-     "label": "Operator - (Subtract)(lhs, rhs)",
+     "label": "Operator -(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -16471,7 +16558,7 @@
     },
     {
      "text": "declare operator - ( byref lhs as T, byref rhs as T ) as integer",
-     "label": "Operator - (Subtract)(lhs, rhs)",
+     "label": "Operator -(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -16487,7 +16574,7 @@
     },
     {
      "text": "declare operator - ( byref lhs as T, byref rhs as integer ) as T",
-     "label": "Operator - (Subtract)(lhs, rhs)",
+     "label": "Operator -(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -16503,7 +16590,7 @@
     },
     {
      "text": "declare operator - ( byref lhs as integer, byref rhs as T ) as T",
-     "label": "Operator - (Subtract)(lhs, rhs)",
+     "label": "Operator -(lhs, rhs)",
      "params": [
       {
        "mode": "byref",
@@ -16523,10 +16610,10 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpSubtract",
    "page": "KeyPgOpSubtract",
-   "id": "operator - (subtract)|keyword"
+   "id": "operator -|keyword#KeyPgOpSubtract"
   },
   {
-   "name": "Operator * (Value of)",
+   "name": "Operator *",
    "title": "Operator * (Value of)",
    "kind": "keyword",
    "category": "Pointer Operators",
@@ -16539,7 +16626,7 @@
    "signatures": [
     {
      "text": "declare operator * ( byref rhs as T pointer ) byref as T",
-     "label": "Operator * (Value of)(rhs)",
+     "label": "Operator *(rhs)",
      "params": [
       {
        "mode": "byref",
@@ -16554,7 +16641,7 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgOpValueOf",
    "page": "KeyPgOpValueOf",
-   "id": "operator * (value of)|keyword"
+   "id": "operator *|keyword#KeyPgOpValueOf"
   },
   {
    "name": "VarPtr",
@@ -19055,7 +19142,7 @@
    "id": "read|keyword#KeyPgReadFile"
   },
   {
-   "name": "READ WRITE (File Access)",
+   "name": "READ WRITE",
    "title": "READ WRITE (File Access)",
    "kind": "keyword",
    "category": "File I/O Functions",
@@ -19064,14 +19151,14 @@
    "signatures": [
     {
      "text": "Open filename As String For Binary Access Read Write As #filenum As Integer",
-     "label": "READ WRITE (File Access)()",
+     "label": "READ WRITE()",
      "params": []
     }
    ],
    "dialect": [],
    "url": "https://www.freebasic.net/wiki/KeyPgReadWriteFile",
    "page": "KeyPgReadWriteFile",
-   "id": "read write (file access)|keyword"
+   "id": "read write|keyword"
   },
   {
    "name": "Reallocate",
@@ -23472,7 +23559,7 @@
    "id": "virtual|keyword"
   },
   {
-   "name": "PRIVATE: (Access Control)",
+   "name": "PRIVATE:",
    "title": "PRIVATE: (Access Control)",
    "kind": "keyword",
    "category": "User Defined Types",
@@ -23481,22 +23568,22 @@
    "signatures": [
     {
      "text": "Type typename",
-     "label": "PRIVATE: (Access Control)()",
+     "label": "PRIVATE:()",
      "params": []
     },
     {
      "text": "Private:",
-     "label": "PRIVATE: (Access Control)()",
+     "label": "PRIVATE:()",
      "params": []
     },
     {
      "text": "member declarations",
-     "label": "PRIVATE: (Access Control)()",
+     "label": "PRIVATE:()",
      "params": []
     },
     {
      "text": "End Type",
-     "label": "PRIVATE: (Access Control)()",
+     "label": "PRIVATE:()",
      "params": []
     }
    ],
@@ -23505,10 +23592,10 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgVisPrivate",
    "page": "KeyPgVisPrivate",
-   "id": "private: (access control)|keyword"
+   "id": "private:|keyword"
   },
   {
-   "name": "PROTECTED: (Access Control)",
+   "name": "PROTECTED:",
    "title": "PROTECTED: (Access Control)",
    "kind": "keyword",
    "category": "User Defined Types",
@@ -23517,22 +23604,22 @@
    "signatures": [
     {
      "text": "Type typename",
-     "label": "PROTECTED: (Access Control)()",
+     "label": "PROTECTED:()",
      "params": []
     },
     {
      "text": "Protected:",
-     "label": "PROTECTED: (Access Control)()",
+     "label": "PROTECTED:()",
      "params": []
     },
     {
      "text": "member declarations",
-     "label": "PROTECTED: (Access Control)()",
+     "label": "PROTECTED:()",
      "params": []
     },
     {
      "text": "End Type",
-     "label": "PROTECTED: (Access Control)()",
+     "label": "PROTECTED:()",
      "params": []
     }
    ],
@@ -23541,10 +23628,10 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgVisProtected",
    "page": "KeyPgVisProtected",
-   "id": "protected: (access control)|keyword"
+   "id": "protected:|keyword"
   },
   {
-   "name": "PUBLIC: (Access Control)",
+   "name": "PUBLIC:",
    "title": "PUBLIC: (Access Control)",
    "kind": "keyword",
    "category": "User Defined Types",
@@ -23553,22 +23640,22 @@
    "signatures": [
     {
      "text": "Type typename",
-     "label": "PUBLIC: (Access Control)()",
+     "label": "PUBLIC:()",
      "params": []
     },
     {
      "text": "Public:",
-     "label": "PUBLIC: (Access Control)()",
+     "label": "PUBLIC:()",
      "params": []
     },
     {
      "text": "member declarations",
-     "label": "PUBLIC: (Access Control)()",
+     "label": "PUBLIC:()",
      "params": []
     },
     {
      "text": "End Type",
-     "label": "PUBLIC: (Access Control)()",
+     "label": "PUBLIC:()",
      "params": []
     }
    ],
@@ -23577,7 +23664,7 @@
    ],
    "url": "https://www.freebasic.net/wiki/KeyPgVisPublic",
    "page": "KeyPgVisPublic",
-   "id": "public: (access control)|keyword"
+   "id": "public:|keyword"
   },
   {
    "name": "Wait",

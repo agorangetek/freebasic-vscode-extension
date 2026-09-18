@@ -1,10 +1,12 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
+	allBlocks,
 	allBuiltins,
 	builtinCount,
 	builtinMarkdown,
 	builtinSource,
+	isCompletableName,
 	lookupBuiltin,
 } from '../src/service/builtins.ts';
 
@@ -86,4 +88,60 @@ test('functions carry parameter types for signature help', () => {
 	assert.ok(abs.signatures.length >= 3, 'Abs should have several overloads');
 	const types = new Set(abs.signatures.flatMap((s) => s.params.map((p) => p.type)));
 	assert.ok(types.has('integer'), `expected an integer overload, got ${[...types]}`);
+});
+
+test('blocks come from the manual, opener and closer paired', () => {
+	const byOpener = new Map(allBlocks().map((b) => [b.opener, b]));
+	assert.deepEqual(
+		[...byOpener.keys()].sort(),
+		[
+			'Constructor',
+			'Destructor',
+			'Do',
+			'Enum',
+			'Extern',
+			'For',
+			'Function',
+			'If',
+			'Namespace',
+			'Operator',
+			'Property',
+			'Scope',
+			'Select Case',
+			'Sub',
+			'Type',
+			'While',
+			'With',
+		],
+	);
+	// the KeyPgEndblock list
+	assert.equal(byOpener.get('Function')?.closer, 'End Function');
+	assert.equal(byOpener.get('Select Case')?.closer, 'End Select');
+	assert.equal(byOpener.get('If')?.closer, 'End If');
+	// loops close with a word of their own
+	assert.equal(byOpener.get('For')?.closer, 'Next');
+	assert.equal(byOpener.get('Do')?.closer, 'Loop');
+	assert.equal(byOpener.get('While')?.closer, 'Wend');
+	for (const block of allBlocks()) {
+		assert.match(block.page, /^KeyPg/, `${block.opener} has no manual page`);
+	}
+});
+
+test('names are identifiers, not manual page titles', () => {
+	for (const item of allBuiltins()) {
+		assert.ok(
+			!/\([^()]*\)\s*$/.test(item.name),
+			`${item.name} still carries a page-title qualifier`,
+		);
+	}
+	// documented for hover, but not something to type
+	assert.equal(isCompletableName('Operator +'), false);
+	assert.equal(isCompletableName('Operator []'), false);
+	assert.equal(isCompletableName('PRIVATE:'), false);
+	assert.equal(isCompletableName('...'), false);
+	// real tokens, including multi-word and preprocessor names
+	assert.equal(isCompletableName('Dim'), true);
+	assert.equal(isCompletableName('DRAW STRING'), true);
+	assert.equal(isCompletableName('#INCLUDE'), true);
+	assert.equal(isCompletableName('__FB_DARWIN__'), true);
 });

@@ -195,3 +195,121 @@ test('symbolToCompletionItem marks callables as snippets', () => {
 	assert.equal(item.insertText, 'f(${1:a})');
 	assert.equal(item.kind, 'function');
 });
+
+const CONTEXT_SOURCE = [
+	'sub main()',
+	'  ',
+	'  dim total as ',
+	'  total = 1 + ',
+	'  end ',
+	'end sub',
+].join('\n');
+const CONTEXT_DOC = parseDocument('file:///ctx.bas', CONTEXT_SOURCE);
+const CONTEXT_OPTIONS = { keywords: true, builtins: true, snippets: true };
+
+function complete(line: number, character: number, word = '') {
+	return buildCompletions({
+		document: CONTEXT_DOC,
+		position: { line, character },
+		word,
+		options: CONTEXT_OPTIONS,
+	});
+}
+
+test('a block opener expands into the whole block', () => {
+	const items = complete(1, 2);
+	const fn = items.find((i) => i.label === 'Function');
+	assert.ok(fn, 'Function is offered at the start of a statement');
+	assert.equal(fn.isSnippet, true);
+	assert.equal(fn.insertText, 'function ${1:name}(${2}) as ${3:integer}\n\t$0\nend function');
+	assert.match(fn.detail, /End Function/);
+
+	// every block from the manual is offered, and closed
+	for (const [opener, closer] of [
+		['Sub', 'End Sub'],
+		['Type', 'End Type'],
+		['For', 'Next'],
+		['Do', 'Loop'],
+		['While', 'Wend'],
+		['Select Case', 'End Select'],
+	]) {
+		const item = items.find((i) => i.label === opener);
+		assert.ok(item, `${opener} is offered`);
+		assert.equal(item.isSnippet, true, `${opener} expands into a block`);
+		assert.match(item.insertText, new RegExp(closer.replace(' ', '\\s+'), 'i'));
+	}
+});
+
+test('plain keywords are still inserted as plain text when snippets are off', () => {
+	const items = buildCompletions({
+		document: CONTEXT_DOC,
+		position: { line: 1, character: 2 },
+		word: '',
+		options: { ...CONTEXT_OPTIONS, snippets: false },
+	});
+	const sub = items.find((i) => i.label === 'Sub');
+	assert.equal(sub?.isSnippet, false);
+	assert.equal(sub?.insertText, 'Sub');
+});
+
+test('after "end" only block terminators are offered', () => {
+	const items = complete(4, 6);
+	const labels = items.map((i) => i.label);
+	// every offered built-in is a block terminator, described as such
+	const terminators = items.filter((i) => /^end /i.test(i.detail)).map((i) => i.label);
+	assert.deepEqual(terminators, [
+		'Constructor',
+		'Destructor',
+		'Enum',
+		'Extern',
+		'Function',
+		'If',
+		'Namespace',
+		'Operator',
+		'Property',
+		'Scope',
+		'Select',
+		'Sub',
+		'Type',
+		'With',
+	]);
+	assert.ok(!labels.includes('Dim'), 'no ordinary keywords after "end"');
+	// loops end with their own word, never with "end next"
+	assert.ok(!labels.includes('next'));
+	assert.ok(!labels.includes('loop'));
+	assert.ok(!labels.includes('wend'));
+});
+
+test('after "as" only types are offered', () => {
+	const items = complete(2, 14);
+	const labels = items.map((i) => i.label);
+	assert.ok(labels.includes('Integer'), labels.join(', '));
+	assert.ok(labels.includes('String'));
+	assert.ok(!labels.includes('Dim'));
+	assert.ok(!labels.includes('Print'));
+	assert.ok(!labels.includes('Function'));
+});
+
+test('mid-expression drops statement keywords but keeps operators', () => {
+	const items = complete(3, 14);
+	const labels = items.map((i) => i.label);
+	assert.ok(labels.includes('Abs'), 'functions are always available');
+	assert.ok(labels.includes('Mod'), 'operators are valid in an expression');
+	assert.ok(labels.includes('Cast'));
+	assert.ok(!labels.includes('Dim'), 'Dim cannot appear mid-expression');
+	assert.ok(!labels.includes('Print'));
+	assert.ok(!labels.includes('Sub'));
+});
+
+test('declaration prefixes get the bare keyword, not a block', () => {
+	const doc = parseDocument('file:///d.bas', 'declare function ');
+	const items = buildCompletions({
+		document: doc,
+		position: { line: 0, character: 17 },
+		word: '',
+		options: CONTEXT_OPTIONS,
+	});
+	const fn = items.find((i) => i.label === 'Function');
+	assert.equal(fn?.isSnippet, false);
+	assert.equal(fn?.insertText, 'Function');
+});

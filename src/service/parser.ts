@@ -310,6 +310,49 @@ export function parseDocument(uri: string, text: string): FbDocument {
 	return { uri, text, symbols, includes };
 }
 
+/** Where the cursor sits in a statement, which decides what may be offered. */
+export type FbStatementKind = 'start' | 'end' | 'as' | 'expression';
+
+export interface FbStatementContext {
+	kind: FbStatementKind;
+	/** Masked text of the statement, before the word being typed. */
+	before: string;
+}
+
+/**
+ * Classify the position of the cursor inside its statement.
+ *
+ * `word` is the identifier being typed (as returned by `wordAt`), so it can be
+ * excluded: a statement beginning "pri" is still the start of a statement.
+ *
+ * Only a trailing operator makes it an expression position -- after "declare
+ * function" or "dim x" a keyword is still perfectly reasonable, and the caller
+ * decides separately whether a statement is fresh enough to scaffold.
+ */
+export function statementContextAt(
+	text: string,
+	position: FbPosition,
+	word = '',
+): FbStatementContext {
+	const line = maskSource(text)[position.line] ?? '';
+	const upto = line.slice(0, Math.max(0, position.character - word.length));
+
+	// ':' starts a new statement, but '::' is a namespace separator
+	const colon = upto.lastIndexOf(':');
+	const before = colon >= 0 && upto[colon - 1] !== ':' ? upto.slice(colon + 1) : upto;
+	const trimmed = before.trim();
+
+	if (trimmed === '') return { kind: 'start', before };
+	if (/\bend$/i.test(trimmed)) return { kind: 'end', before };
+	if (/\bas$/i.test(trimmed)) return { kind: 'as', before };
+
+	// an operator or an opening bracket is waiting for an operand
+	if (/(?:[=+\-*/\\^&<>(),]|\b(?:and|or|not|mod|xor|eqv|imp|shl|shr|to|step))\s*$/i.test(trimmed)) {
+		return { kind: 'expression', before };
+	}
+	return { kind: 'start', before };
+}
+
 /** The identifier at a position, with its range. */
 export function wordAt(
 	text: string,

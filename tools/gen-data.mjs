@@ -271,6 +271,17 @@ for (const item of items) {
 		item.name = better;
 		renamed++;
 	}
+	// Where a page has no identifier in its syntax, its title is used as the
+	// name -- and titles disambiguate themselves, as in "ALIAS (Name)" or
+	// "Operator + (Addition)".  The qualifier belongs to the title, not the
+	// name; the title is kept as-is for the manual link.
+	let bare = item.name;
+	for (let previous = ''; bare !== previous; ) {
+		previous = bare;
+		bare = bare.replace(/\s*\([^()]*\)\s*$/, '').trim();
+	}
+	if (bare.length > 0) item.name = bare;
+
 	// declarations, call labels and prose all carried the manual's spelling
 	for (const sig of item.signatures) {
 		sig.text = renameInDeclaration(sig.text, item.name);
@@ -279,6 +290,56 @@ for (const item of items) {
 	item.summary = unescapeWakka(item.summary);
 	item.usage = item.usage.map(unescapeWakka);
 	item.dialect = item.dialect.map(unescapeWakka);
+}
+
+/* ------------------------------------------------------------------ blocks */
+
+/*
+ * There is no page for "End Function": "End" is documented once, on
+ * KeyPgEndblock, whose syntax line lists every block terminator and links to
+ * the page that opens the block.  That list is the authority for these; the
+ * loops close with a word of their own (Next / Loop / Wend), which their own
+ * page's syntax section ends with.
+ */
+const TERMINATOR_RE =
+	/^(Next|Loop|Wend|End\s+(?:Sub|Function|If|Select|Type|Enum|Scope|With|Namespace|Extern|Constructor|Destructor|Operator|Property))\b/i;
+
+/** These open with more than one word. */
+const OPENING_WORDS = new Map([['select', 'Select Case']]);
+/** The endblock page links to KeyPgExtern; the content is on KeyPgExternBlock. */
+const PAGE_ALIASES = new Map([['KeyPgExtern', 'KeyPgExternBlock']]);
+
+/** The terminator a page's own syntax section ends with. */
+function terminatorOf(item) {
+	const hits = (item?.signatures ?? [])
+		.map((s) => TERMINATOR_RE.exec(s.text.trim())?.[1])
+		.filter(Boolean);
+	return hits.length > 0 ? hits[hits.length - 1] : undefined;
+}
+
+const byPage = new Map(items.map((i) => [i.page, i]));
+const blocks = [];
+const addBlock = (opener, closer, page) => {
+	if (blocks.some((b) => b.opener.toLowerCase() === opener.toLowerCase())) return;
+	blocks.push({ opener, closer, page });
+};
+
+const endblockPage = readFileSync(join(cacheDir, 'KeyPgEndblock.wakka'), 'utf8');
+for (const m of section(endblockPage, 'syntax').matchAll(/\[\[(KeyPg\w+)\|([^\]|]+)\]\]/g)) {
+	const word = OPENING_WORDS.get(m[2].toLowerCase()) ?? m[2];
+	addBlock(word, `End ${m[2]}`, PAGE_ALIASES.get(m[1]) ?? m[1]);
+}
+for (const [page, fallback] of [
+	['KeyPgFornext', 'Next'],
+	['KeyPgDo', 'Loop'],
+	['KeyPgWhile', 'Wend'],
+]) {
+	const item = byPage.get(page);
+	addBlock(item?.name ?? fallback, terminatorOf(item) ?? fallback, page);
+}
+for (const block of blocks) {
+	const better = preferred.get(block.opener.toLowerCase());
+	if (better) block.opener = better;
 }
 
 // The manual has separate pages for the same name in different roles (Mid
@@ -302,6 +363,7 @@ const out = {
 	source: `FreeBASIC ${version} manual`,
 	generatedFrom: cacheDir,
 	count: items.length,
+	blocks,
 	items,
 };
 
@@ -335,6 +397,7 @@ for (const it of items) {
 console.log(`wrote ${outFile}`);
 console.log(`wrote ${tsFile}`);
 console.log(`  ${items.length} items from ${files.length} pages`);
+console.log(`  ${blocks.length} blocks:`, blocks.map((b) => `${b.opener}..${b.closer}`).join(', '));
 console.log('  kinds:', byKind);
 console.log(
 	'  top categories:',

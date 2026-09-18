@@ -14,6 +14,13 @@ release was a syntax-highlighting-only TextMate grammar.
 - **Code completion**, backed by a database of 634 built-in names (functions,
   statements and keywords) generated from the official FreeBASIC manual, plus
   symbols parsed from the current document and the workspace.
+- **Block scaffolds**: accepting `Function`, `Sub`, `Type`, `If`, `For`, `Do`,
+  `While`, `Select Case`, … at the start of a statement inserts the whole block
+  with its terminator. The 17 openers and their terminators are generated from
+  the manual's block-terminator page (`KeyPgEndblock`).
+- **Context-aware completion**: statement keywords only where a statement can
+  start, types after `As`, block terminators after `End`, and no statement
+  keywords mid-expression.
 - **Hover** documentation for built-ins: summary, syntax and manual category.
 - **Signature help** while typing a call, highlighting the active parameter.
 - **Document symbols / outline** for procedures, types, enums, constants and labels.

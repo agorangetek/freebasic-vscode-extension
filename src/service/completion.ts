@@ -2,8 +2,9 @@
  * Completion item construction.  Editor-agnostic: returns plain objects that
  * the VS Code layer (src/extension.ts) converts to vscode.CompletionItem.
  */
-import { allBuiltins, builtinMarkdown } from './builtins.ts';
-import { parameterNames } from './parser.ts';
+import { allBlocks, allBuiltins, builtinMarkdown, isCompletableName } from './builtins.ts';
+import { BLOCK_CONTINUATIONS, blockBody, endWords, isDeclarationPrefix } from './blocks.ts';
+import { parameterNames, statementContextAt } from './parser.ts';
 import type {
 	FbBuiltin,
 	FbCompletionItem,
@@ -22,6 +23,29 @@ const RANK = {
 	builtin: '3',
 	keyword: '4',
 } as const;
+
+/**
+ * Manual categories whose entries are statements.  These are only offered where
+ * a statement can start -- mid-expression the list would be mostly noise.
+ */
+const STATEMENT_CATEGORIES = new Set([
+	'2D Drawing Functions',
+	'Array Functions',
+	'Compiler Switches',
+	'Console Functions',
+	'Control Flow',
+	'Error Handling Functions',
+	'File I/O Functions',
+	'Modularizing',
+	'Preprocessor',
+	'Procedures',
+	'Screen Functions',
+	'Table of Contents',
+	'Threading Support Functions',
+	'User Defined Types',
+	'User Input',
+	'Variable Declarations',
+]);
 
 function symbolKindToCompletion(kind: FbSymbol['kind']): FbCompletionKind {
 	switch (kind) {
@@ -139,11 +163,16 @@ export function enclosingProcedure(document: FbDocument, position: FbPosition): 
  * Build the completion list for a position.  Higher-priority sources come
  * first (locals, then this document, then the workspace, then built-ins), and
  * duplicates are dropped so the best-ranked entry wins.
+ *
+ * What is offered also depends on where the cursor is in its statement: a
+ * statement keyword is useless in the middle of an expression, `as` is always
+ * followed by a type, and `end` by the name of a block.
  */
 export function buildCompletions(request: CompletionRequest): FbCompletionItem[] {
-	const { document, workspaceSymbols = [], position, options } = request;
+	const { document, workspaceSymbols = [], position, options, word } = request;
 	const items: FbCompletionItem[] = [];
 	const seen = new Set<string>();
+	const context = statementContextAt(document.text, position, word);
 
 	const push = (item: FbCompletionItem) => {
 		const key = item.label.toLowerCase();
@@ -183,15 +212,81 @@ export function buildCompletions(request: CompletionRequest): FbCompletionItem[]
 		push(symbolToCompletionItem(symbol, RANK.workspace, options.snippets));
 	}
 
-	// 4. built-in functions, then the rest of the language
+	// 4. after "end", only the words that can finish a block are useful
+	if (context.kind === 'end') {
+		if (!options.keywords) return items;
+		for (const [index, name] of endWords(allBlocks()).entries()) {
+			push({
+				label: name,
+				kind: 'keyword',
+				detail: `end ${name}`,
+				insertText: name,
+				isSnippet: false,
+				sortText: RANK.keyword + String(index).padStart(2, '0') + name,
+			});
+		}
+		return items;
+	}
+
+	// 5. after "as", only types make sense
+	if (context.kind === 'as') {
+		if (options.keywords) {
+			for (const item of allBuiltins()) {
+				if (item.category === 'Standard Data Types' && isCompletableName(item.name)) {
+					push(builtinToCompletionItem(item, RANK.keyword, false));
+				}
+			}
+		}
+		return items;
+	}
+
+	const statementStart = context.kind === 'start';
+	// a fresh statement, with nothing on the line yet: where a block belongs
+	const freshStatement = /^\s*$/.test(context.before);
+
+	// 6. built-in functions are valid in any expression
 	if (options.builtins) {
 		for (const item of allBuiltins()) {
-			if (item.kind === 'function') push(builtinToCompletionItem(item, RANK.builtin, options.snippets));
+			if (item.kind === 'function' && isCompletableName(item.name)) {
+				push(builtinToCompletionItem(item, RANK.builtin, options.snippets));
+			}
 		}
 	}
+
+	// 7. at the start of a statement, the block openers expand into a whole
+	//    skeleton -- that is where "End Function" comes from
+	if (options.keywords && freshStatement && !isDeclarationPrefix(context.before)) {
+		for (const block of allBlocks()) {
+			const body = options.snippets ? blockBody(block) : undefined;
+			push({
+				label: block.opener,
+				kind: 'keyword',
+				detail: body ? `${block.opener} ... ${block.closer}` : block.opener,
+				documentation: `Insert a \`${block.opener}\` block, closed with \`${block.closer}\`.`,
+				insertText: body ?? block.opener,
+				isSnippet: body !== undefined,
+				sortText: RANK.keyword + (body ? '0' : '1') + block.opener.toLowerCase(),
+			});
+		}
+		for (const { label, detail } of BLOCK_CONTINUATIONS) {
+			push({
+				label,
+				kind: 'keyword',
+				detail,
+				insertText: label,
+				isSnippet: false,
+				sortText: RANK.keyword + '2' + label.toLowerCase(),
+			});
+		}
+	}
+
+	// 8. the rest of the language; mid-expression only operators and the like
 	if (options.keywords) {
 		for (const item of allBuiltins()) {
-			if (item.kind !== 'function') push(builtinToCompletionItem(item, RANK.keyword, false));
+			if (item.kind === 'function') continue;
+			if (!isCompletableName(item.name)) continue;
+			if (!statementStart && STATEMENT_CATEGORIES.has(item.category)) continue;
+			push(builtinToCompletionItem(item, RANK.keyword, false));
 		}
 	}
 

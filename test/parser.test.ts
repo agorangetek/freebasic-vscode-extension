@@ -5,6 +5,7 @@ import {
 	maskSource,
 	parameterNames,
 	parseDocument,
+	statementContextAt,
 	wordAt,
 } from '../src/service/parser.ts';
 
@@ -107,4 +108,27 @@ test('callContextAt reports the callee and the active parameter', () => {
 	const outer = callContextAt(nested, { line: 0, character: 15 });
 	assert.equal(outer?.callee, 'foo');
 	assert.equal(outer?.activeParameter, 1);
+});
+
+test('statementContextAt classifies the cursor position', () => {
+	const text = [
+		'  pri',
+		'  dim x as ',
+		'  end ',
+		'  total = 1 + ',
+		'  print "a" : ',
+		'  ns::mem',
+	].join('\n');
+
+	assert.equal(statementContextAt(text, { line: 0, character: 5 }, 'pri').kind, 'start');
+	assert.equal(statementContextAt(text, { line: 1, character: 11 }, '').kind, 'as');
+	assert.equal(statementContextAt(text, { line: 2, character: 6 }, '').kind, 'end');
+	assert.equal(statementContextAt(text, { line: 3, character: 14 }, '').kind, 'expression');
+	assert.equal(statementContextAt('declare function ', { line: 0, character: 17 }, '').kind, 'start');
+	// a ':' starts a new statement
+	assert.equal(statementContextAt(text, { line: 4, character: 14 }, '').kind, 'start');
+	// but '::' is a namespace separator, so the statement is not sliced at it
+	assert.equal(statementContextAt(text, { line: 5, character: 9 }, 'mem').before, '  ns::');
+	// comments and strings are masked away
+	assert.equal(statementContextAt("' dim ", { line: 0, character: 6 }, '').kind, 'start');
 });

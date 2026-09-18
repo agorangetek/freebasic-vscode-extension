@@ -88,11 +88,23 @@ export interface FbBuiltin {
 	page: string;
 }
 
+/** A compound statement block: what opens it and what closes it. */
+export interface FbBlock {
+	/** The word(s) that open the block, e.g. "Select Case". */
+	opener: string;
+	/** The word(s) that close it, e.g. "End Select", "Next", "Wend". */
+	closer: string;
+	/** Manual page documenting the opener. */
+	page: string;
+}
+
 export interface FbBuiltinData {
 	source: string;
 	/** Absolute path of the manual checkout this data was generated from. */
 	generatedFrom?: string;
 	count: number;
+	/** Block constructs, from the manual's KeyPgEndblock terminator list. */
+	blocks: FbBlock[];
 	items: FbBuiltin[];
 }
 

@@ -16,7 +16,22 @@ Completion covers the whole language surface, not just keywords:
   variables and labels, indexed from the current file and (optionally) from
   every `.bas`/`.bi` file in the workspace.
 * **Context awareness** — keywords are only offered where a statement can
-  start; after `Dim x As` you get types, after `End` you get `Sub`/`Function`/…
+  start. After `Dim x As` you get types; after `End` you get `Sub`, `Function`,
+  `Select`, …; mid-expression you get functions and operators without the
+  statement keywords getting in the way.
+* **Blocks that close themselves** — accepting `Function`, `Sub`, `Type`, `If`,
+  `For`, `Do`, `While`, `Select Case`, … at the start of a statement inserts the
+  whole skeleton, closer included. Typing `function` and accepting gives:
+
+  ```freebasic
+  function name() as integer
+
+  end function
+  ```
+
+  The openers and their terminators are read from the manual's block-terminator
+  page (`KeyPgEndblock`), which is the only place `End Function` is documented —
+  there is no page for the combination itself.
 * **Call snippets** — functions with parameters insert a snippet with
   tab stops, e.g. `Left(str, n)` arrives as `Left(${1:str}, ${2:n})`.
 * **Smart casing** — completion matches however you type, but always inserts
