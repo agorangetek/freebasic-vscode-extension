@@ -1,44 +1,124 @@
 {
-    "name": "freebasic",
-    "displayName": "FreeBASIC",
-    "description": "Modern FreeBASIC language support for Visual Studio Code.",
-    "version": "0.0.0",
-    "engines": {
-        "vscode": "^1.65.0"
-    },
-    "categories": [
-        "Programming Languages"
-    ],
-    "license": "MIT",
-    "publisher": "sorucoder",
-    "keywords": [
-        "freebasic"
-    ],
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/sorucoder/freebasic-vscode-extension"
-    },
-    "contributes": {
-        "languages": [
-            {
-                "id": "freebasic",
-                "aliases": [
-                    "FreeBASIC",
-                    "freebasic"
-                ],
-                "extensions": [
-                    ".bas",
-                    ".bi"
-                ],
-                "configuration": "./language-configuration.json"
-            }
-        ],
-        "grammars": [
-            {
-                "language": "freebasic",
-                "scopeName": "source.freebasic",
-                "path": "./syntaxes/freebasic.tmLanguage.json"
-            }
-        ]
-    }
+	"name": "freebasic",
+	"displayName": "FreeBASIC",
+	"description": "FreeBASIC language support for Visual Studio Code: code completion, hover, signature help and document outline.",
+	"version": "0.1.0",
+	"publisher": "sorucoder",
+	"license": "MIT",
+	"engines": {
+		"vscode": "^1.75.0",
+		"node": ">=18"
+	},
+	"categories": [
+		"Programming Languages"
+	],
+	"keywords": [
+		"freebasic",
+		"basic",
+		"fbc",
+		"quickbasic"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/sorucoder/freebasic-vscode-extension"
+	},
+	"main": "./dist/extension.js",
+	"activationEvents": [
+		"onLanguage:freebasic"
+	],
+	"contributes": {
+		"languages": [
+			{
+				"id": "freebasic",
+				"aliases": [
+					"FreeBASIC",
+					"freebasic"
+				],
+				"extensions": [
+					".bas",
+					".bi"
+				],
+				"configuration": "./language-configuration.json"
+			}
+		],
+		"grammars": [
+			{
+				"language": "freebasic",
+				"scopeName": "source.freebasic",
+				"path": "./syntaxes/freebasic.tmLanguage.json"
+			}
+		],
+		"configuration": {
+			"title": "FreeBASIC",
+			"properties": {
+				"freebasic.completion.enable": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable FreeBASIC code completion."
+				},
+				"freebasic.completion.keywords": {
+					"type": "boolean",
+					"default": true,
+					"description": "Offer language keywords (Dim, If, ScreenRes, ...) in completion."
+				},
+				"freebasic.completion.builtins": {
+					"type": "boolean",
+					"default": true,
+					"description": "Offer built-in functions and statements (Left, Abs, ...) in completion."
+				},
+				"freebasic.completion.snippets": {
+					"type": "boolean",
+					"default": true,
+					"description": "Insert a call snippet with parameter placeholders for functions that have parameters."
+				},
+				"freebasic.index.workspace": {
+					"type": "boolean",
+					"default": true,
+					"description": "Index .bas/.bi files across the workspace so symbols from other modules are completed too."
+				},
+				"freebasic.index.maxFiles": {
+					"type": "number",
+					"default": 400,
+					"description": "Maximum number of workspace files to index."
+				},
+				"freebasic.trace.server": {
+					"type": "string",
+					"enum": [
+						"off",
+						"messages",
+						"verbose"
+					],
+					"default": "off",
+					"description": "Trace language service activity to the FreeBASIC output channel (for troubleshooting)."
+				}
+			}
+		},
+		"commands": [
+			{
+				"command": "freebasic.reindex",
+				"title": "FreeBASIC: Rebuild Symbol Index"
+			},
+			{
+				"command": "freebasic.showIndexStats",
+				"title": "FreeBASIC: Show Symbol Index Statistics"
+			}
+		]
+	},
+	"scripts": {
+		"gen-data": "node tools/gen-data.mjs",
+		"build": "node esbuild.mjs",
+		"watch": "node esbuild.mjs --watch",
+		"typecheck": "tsc --noEmit",
+		"test": "node --test test/*.test.ts",
+		"check": "npm run typecheck && npm run test && npm run build",
+		"vscode:prepublish": "npm run build",
+		"package": "vsce package"
+	},
+	"devDependencies": {
+		"@types/node": "^22.10.2",
+		"@types/vscode": "^1.75.0",
+		"@vscode/vsce": "^3.2.1",
+		"esbuild": "^0.24.2",
+		"typescript": "^5.7.2"
+	}
 }
