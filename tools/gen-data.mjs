@@ -299,6 +299,34 @@ function unescapeWakka(text) {
 	return text.replace(/""/g, '"');
 }
 
+/*
+ * fbc's own source is written with lower-case keywords, and that is the style
+ * this data follows: every language keyword is lower case. The runtime library
+ * keeps the spelling its own headers use -- `ScreenRes`, `Left` -- so only
+ * items that are language, rather than library, are folded down.
+ *
+ * Language is: every keyword page, plus the statements that happen to be
+ * documented with a "declare sub". The intrinsic defines stay upper case,
+ * since that is how they are invariably written.
+ */
+const LANGUAGE_STATEMENTS = new Set([
+	'beep',
+	'clear',
+	'cls',
+	'end',
+	'erase',
+	'error',
+	'lset',
+	'mid',
+	'poke',
+	'randomize',
+	'reset',
+	'rset',
+	'stop',
+	'swap',
+	'system',
+]);
+
 const preferred = preferredCasing(
 	items.map((i) => i.name),
 	join(fbcRoot, 'examples'),
@@ -320,6 +348,10 @@ for (const item of items) {
 		bare = bare.replace(/\s*\([^()]*\)\s*$/, '').trim();
 	}
 	if (bare.length > 0) item.name = bare;
+
+	const isLanguage =
+		item.kind === 'keyword' || LANGUAGE_STATEMENTS.has(item.name.toLowerCase());
+	if (isLanguage && !item.name.startsWith('__')) item.name = item.name.toLowerCase();
 
 	// declarations, call labels and prose all carried the manual's spelling
 	for (const sig of item.signatures) {
@@ -379,6 +411,9 @@ for (const [page, fallback] of [
 for (const block of blocks) {
 	const better = preferred.get(block.opener.toLowerCase());
 	if (better) block.opener = better;
+	// block openers and terminators are language keywords like any other
+	block.opener = block.opener.toLowerCase();
+	block.closer = block.closer.toLowerCase();
 }
 
 // The manual has separate pages for the same name in different roles (Mid

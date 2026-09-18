@@ -218,20 +218,20 @@ function complete(line: number, character: number, word = '') {
 
 test('a block opener expands into the whole block', () => {
 	const items = complete(1, 2);
-	const fn = items.find((i) => i.label === 'Function');
-	assert.ok(fn, 'Function is offered at the start of a statement');
+	const fn = items.find((i) => i.label === 'function');
+	assert.ok(fn, 'function is offered at the start of a statement');
 	assert.equal(fn.isSnippet, true);
-	assert.equal(fn.insertText, 'Function ${1:name}(${2}) As ${3:Integer}\n\t$0\nEnd Function');
-	assert.match(fn.detail, /End Function/);
+	assert.equal(fn.insertText, 'function ${1:name}(${2}) as ${3:integer}\n\t$0\nend function');
+	assert.match(fn.detail, /end function/);
 
 	// every block from the manual is offered, and closed
 	for (const [opener, closer] of [
-		['Sub', 'End Sub'],
-		['Type', 'End Type'],
-		['For', 'Next'],
-		['Do', 'Loop'],
-		['While', 'Wend'],
-		['Select Case', 'End Select'],
+		['sub', 'end sub'],
+		['type', 'end type'],
+		['for', 'next'],
+		['do', 'loop'],
+		['while', 'wend'],
+		['select case', 'end select'],
 	]) {
 		const item = items.find((i) => i.label === opener);
 		assert.ok(item, `${opener} is offered`);
@@ -247,9 +247,9 @@ test('plain keywords are still inserted as plain text when snippets are off', ()
 		word: '',
 		options: { ...CONTEXT_OPTIONS, snippets: false },
 	});
-	const sub = items.find((i) => i.label === 'Sub');
+	const sub = items.find((i) => i.label === 'sub');
 	assert.equal(sub?.isSnippet, false);
-	assert.equal(sub?.insertText, 'Sub');
+	assert.equal(sub?.insertText, 'sub');
 });
 
 test('after "end" only block terminators are offered', () => {
@@ -258,22 +258,22 @@ test('after "end" only block terminators are offered', () => {
 	// every offered built-in is a block terminator, described as such
 	const terminators = items.filter((i) => /^end /i.test(i.detail)).map((i) => i.label);
 	assert.deepEqual(terminators, [
-		'Constructor',
-		'Destructor',
-		'Enum',
-		'Extern',
-		'Function',
-		'If',
-		'Namespace',
-		'Operator',
-		'Property',
-		'Scope',
-		'Select',
-		'Sub',
-		'Type',
-		'With',
+		'constructor',
+		'destructor',
+		'enum',
+		'extern',
+		'function',
+		'if',
+		'namespace',
+		'operator',
+		'property',
+		'scope',
+		'select',
+		'sub',
+		'type',
+		'with',
 	]);
-	assert.ok(!labels.includes('Dim'), 'no ordinary keywords after "end"');
+	assert.ok(!labels.includes('dim'), 'no ordinary keywords after "end"');
 	// loops end with their own word, never with "end next"
 	assert.ok(!labels.includes('next'));
 	assert.ok(!labels.includes('loop'));
@@ -283,22 +283,22 @@ test('after "end" only block terminators are offered', () => {
 test('after "as" only types are offered', () => {
 	const items = complete(2, 14);
 	const labels = items.map((i) => i.label);
-	assert.ok(labels.includes('Integer'), labels.join(', '));
-	assert.ok(labels.includes('String'));
-	assert.ok(!labels.includes('Dim'));
-	assert.ok(!labels.includes('Print'));
-	assert.ok(!labels.includes('Function'));
+	assert.ok(labels.includes('integer'), labels.join(', '));
+	assert.ok(labels.includes('string'));
+	assert.ok(!labels.includes('dim'));
+	assert.ok(!labels.includes('print'));
+	assert.ok(!labels.includes('function'));
 });
 
 test('mid-expression drops statement keywords but keeps operators', () => {
 	const items = complete(3, 14);
 	const labels = items.map((i) => i.label);
 	assert.ok(labels.includes('Abs'), 'functions are always available');
-	assert.ok(labels.includes('Mod'), 'operators are valid in an expression');
-	assert.ok(labels.includes('Cast'));
-	assert.ok(!labels.includes('Dim'), 'Dim cannot appear mid-expression');
-	assert.ok(!labels.includes('Print'));
-	assert.ok(!labels.includes('Sub'));
+	assert.ok(labels.includes('mod'), 'operators are valid in an expression');
+	assert.ok(labels.includes('cast'));
+	assert.ok(!labels.includes('dim'), 'dim cannot appear mid-expression');
+	assert.ok(!labels.includes('print'));
+	assert.ok(!labels.includes('sub'));
 });
 
 test('declaration prefixes get the bare keyword, not a block', () => {
@@ -309,9 +309,9 @@ test('declaration prefixes get the bare keyword, not a block', () => {
 		word: '',
 		options: CONTEXT_OPTIONS,
 	});
-	const fn = items.find((i) => i.label === 'Function');
+	const fn = items.find((i) => i.label === 'function');
 	assert.equal(fn?.isSnippet, false);
-	assert.equal(fn?.insertText, 'Function');
+	assert.equal(fn?.insertText, 'function');
 });
 
 test('what gets inserted is spelled like the label that was offered', () => {
@@ -329,10 +329,10 @@ test('what gets inserted is spelled like the label that was offered', () => {
 
 test('block continuations are spelled like the block they close', () => {
 	const labels = complete(1, 2).map((i) => i.label);
-	for (const closer of ['End Sub', 'End Function', 'End If', 'End Select', 'End Type', 'Next', 'Loop', 'Wend']) {
+	for (const closer of ['end sub', 'end function', 'end if', 'end select', 'end type', 'next', 'loop', 'wend']) {
 		assert.ok(labels.includes(closer), `${closer} is offered, got ${labels.filter((l) => /end|next|loop|wend/i.test(l)).join(', ')}`);
 	}
-	for (const extra of ['Else', 'ElseIf', 'Case', 'Case Else', 'Continue', 'Exit']) {
+	for (const extra of ['else', 'elseif', 'case', 'case else', 'continue', 'exit']) {
 		assert.ok(labels.includes(extra), `${extra} is offered`);
 	}
 });

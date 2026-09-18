@@ -20,12 +20,12 @@ import type { FbBlock } from './types.ts';
  * `Continue` and `Exit` do have one and are spelled the same way.
  */
 const EXTRA_CONTINUATIONS: readonly { label: string; detail: string }[] = [
-	{ label: 'Else', detail: 'alternative branch' },
-	{ label: 'ElseIf', detail: 'conditional branch' },
-	{ label: 'Case', detail: 'select case branch' },
-	{ label: 'Case Else', detail: 'default select case branch' },
-	{ label: 'Continue', detail: 'continue a loop' },
-	{ label: 'Exit', detail: 'exit a loop or procedure' },
+	{ label: 'else', detail: 'alternative branch' },
+	{ label: 'elseif', detail: 'conditional branch' },
+	{ label: 'case', detail: 'select case branch' },
+	{ label: 'case else', detail: 'default select case branch' },
+	{ label: 'continue', detail: 'continue a loop' },
+	{ label: 'exit', detail: 'exit a loop or procedure' },
 ];
 
 /**
@@ -35,13 +35,13 @@ const EXTRA_CONTINUATIONS: readonly { label: string; detail: string }[] = [
  */
 const BLOCK_BODIES = new Map<string, (b: FbBlock) => string>([
 	['sub', (b) => `${b.opener} \${1:name}(\${2})\n\t$0\n${b.closer}`],
-	['function', (b) => `${b.opener} \${1:name}(\${2}) As \${3:Integer}\n\t$0\n${b.closer}`],
+	['function', (b) => `${b.opener} \${1:name}(\${2}) as \${3:integer}\n\t$0\n${b.closer}`],
 	['constructor', (b) => `${b.opener} \${1:name}(\${2})\n\t$0\n${b.closer}`],
 	['destructor', (b) => `${b.opener} \${1:name}()\n\t$0\n${b.closer}`],
-	['property', (b) => `${b.opener} \${1:name}(\${2}) As \${3:Integer}\n\t$0\n${b.closer}`],
+	['property', (b) => `${b.opener} \${1:name}(\${2}) as \${3:integer}\n\t$0\n${b.closer}`],
 	[
 		'operator',
-		(b) => `${b.opener} \${1:symbol}(\${2}) As \${3:Integer}\n\t$0\n${b.closer}`,
+		(b) => `${b.opener} \${1:symbol}(\${2}) as \${3:integer}\n\t$0\n${b.closer}`,
 	],
 	['type', (b) => `${b.opener} \${1:name}\n\t$0\n${b.closer}`],
 	['union', (b) => `${b.opener} \${1:name}\n\t$0\n${b.closer}`],
@@ -50,14 +50,14 @@ const BLOCK_BODIES = new Map<string, (b: FbBlock) => string>([
 	['namespace', (b) => `${b.opener} \${1:name}\n\t$0\n${b.closer}`],
 	['scope', (b) => `${b.opener}\n\t$0\n${b.closer}`],
 	['with', (b) => `${b.opener} \${1:expression}\n\t$0\n${b.closer}`],
-	['if', (b) => `${b.opener} \${1:condition} Then\n\t$0\n${b.closer}`],
+	['if', (b) => `${b.opener} \${1:condition} then\n\t$0\n${b.closer}`],
 	[
 		'select case',
-		(b) => `${b.opener} \${1:expression}\n\tCase \${2:value}\n\t\t$0\n${b.closer}`,
+		(b) => `${b.opener} \${1:expression}\n\tcase \${2:value}\n\t\t$0\n${b.closer}`,
 	],
 	[
 		'for',
-		(b) => `${b.opener} \${1:i} As Integer = \${2:0} To \${3:n}\n\t$0\n${b.closer} \${1:i}`,
+		(b) => `${b.opener} \${1:i} as integer = \${2:0} to \${3:n}\n\t$0\n${b.closer} \${1:i}`,
 	],
 	['do', (b) => `${b.opener}\n\t$0\n${b.closer}`],
 	['while', (b) => `${b.opener} \${1:condition}\n\t$0\n${b.closer}`],

@@ -11,7 +11,9 @@ Completion covers the whole language surface, not just keywords:
 
 * **634 built-in names** generated from the official FreeBASIC manual — every
   intrinsic function, statement and keyword, with its real signature, summary
-  and manual category.
+  and manual category. Language keywords are lower case (`dim`, `print`,
+  `end sub`), following the style fbc's own source is written in; runtime library
+  routines keep the spelling their headers use (`Left`, `ScreenRes`).
 * **Your own symbols** — procedures, types, enums, constants, `#define`s,
   variables and labels, indexed from the current file and (optionally) from
   every `.bas`/`.bi` file in the workspace.
@@ -24,23 +26,24 @@ Completion covers the whole language surface, not just keywords:
   whole skeleton, closer included. Accepting `Function` gives:
 
   ```freebasic
-  Function name() As Integer
+  function name() as integer
 
-  End Function
+  end function
   ```
 
-  Keywords are inserted capitalised, matching the label the completion list
-  showed. The openers and their terminators are read from the manual's
-  block-terminator page (`KeyPgEndblock`), which is the only place `End Function`
+  The openers and their terminators are read from the manual's
+  block-terminator page (`KeyPgEndblock`), which is the only place `end function`
   is documented — there is no page for the combination itself.
 * **Call snippets** — functions with parameters insert a snippet with
   tab stops, e.g. `Left(str, n)` arrives as `Left(${1:str}, ${2:n})`.
-* **Smart casing** — completion matches however you type, but always inserts
-  the conventional spelling (`ScreenRes`, `GetMouse`, `InKey` — the manual's
-  own `Screenres`/`Inkey` are overridden by what example code actually uses).
+* **Smart casing** — completion matches however you type, but always inserts the
+  canonical spelling: lower case for language keywords, and the runtime
+  library's own spelling for library routines (`ScreenRes`, `GetMouse`, `Left`)
+  rather than the manual's inconsistent `Screenres`/`Getmouse`/`Inkey`.
 
-Casing is learned at generation time from ~1,500 programs in the FreeBASIC
-`examples/` tree, so proposals look like the code people really write.
+Keyword casing follows fbc's own source; the spelling of library routines is
+learned at generation time from ~1,600 programs in the FreeBASIC `examples/`
+tree, so proposals look like the code people really write.
 
 ### Format Text — canonical casing
 
@@ -65,11 +68,11 @@ functions and block terminators — and leaves everything else byte for byte:
   second time.
 
 ```freebasic
-sub main()                          Sub main()
-  dim x as double                     Dim x As Double
-  screenres 640, 480          ->      ScreenRes 640, 480
-  print left("dim", 3)               Print Left("dim", 3)
-end sub                             End Sub
+sub main()                          sub Main()
+  dim x as double                     dim x as double
+  ScreenRes 640, 480                  ScreenRes 640, 480
+  print left("dim", 3)                print Left("dim", 3)
+end sub                             end sub
 ```
 
 ### Hover and signature help

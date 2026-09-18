@@ -21,14 +21,14 @@ test('keywords, datatypes and built-in functions get their canonical spelling', 
 	assert.equal(
 		text,
 		[
-			'Sub Main()',
-			'\tDim x As Double',
+			'sub Main()',
+			'\tdim x as double',
 			'\tScreenRes 640, 480',
-			'\tPrint Left("abc", 2)',
-			'End Sub',
+			'\tprint Left("abc", 2)',
+			'end sub',
 		].join('\n'),
 	);
-	assert.equal(changes, 10);
+	assert.equal(changes, 3);
 });
 
 test('procedures and types are capitalised, wherever they are written', () => {
@@ -46,9 +46,9 @@ test('procedures and types are capitalised, wherever they are written', () => {
 		'end sub',
 	].join('\n');
 	const { text } = format(source);
-	assert.ok(text.includes('Type Vec2'), text);
-	assert.ok(text.includes('Function Scaleby(ByRef v As Vec2) As Vec2'), text);
-	assert.ok(text.includes('\tDim p As Vec2'), text);
+	assert.ok(text.includes('type Vec2'), text);
+	assert.ok(text.includes('function Scaleby(byref v as Vec2) as Vec2'), text);
+	assert.ok(text.includes('\tdim p as Vec2'), text);
 	// every spelling of the call converges on the declaration's capitalised one
 	assert.ok(text.includes('\tScaleby p'), text);
 	assert.ok(!text.includes('scaleby'), text);
@@ -74,8 +74,8 @@ test('variables, constants and labels are left exactly as written', () => {
 		assert.ok(text.includes(untouched), `${untouched} was rewritten:\n${text}`);
 	}
 	// ... while the language around them is still fixed
-	assert.ok(text.includes('Const WIDTH = 640'), text);
-	assert.ok(text.includes('\tFor i As Integer = 0 To maxSize'), text);
+	assert.ok(text.includes('const WIDTH = 640'), text);
+	assert.ok(text.includes('\tfor i as integer = 0 to maxSize'), text);
 });
 
 test('a local shadowing a built-in keeps the built-in out of the file', () => {
@@ -89,16 +89,16 @@ test('a local shadowing a built-in keeps the built-in out of the file', () => {
 		'end sub',
 	].join('\n');
 	const { text } = format(source);
-	assert.ok(text.includes('\tDim left As Integer'), text);
-	assert.ok(text.includes('\tPrint left'), text);
+	assert.ok(text.includes('\tdim left as integer'), text);
+	assert.ok(text.includes('\tprint left'), text);
 	// the surrounding keywords are still corrected
-	assert.ok(text.includes('Sub Main()'), text);
-	assert.ok(text.includes('\tPrint left'), text);
+	assert.ok(text.includes('sub Main()'), text);
+	assert.ok(text.includes('\tprint left'), text);
 });
 
 test('intrinsic defines keep their upper case', () => {
 	const { text } = format('dim a as integer = __fb_darwin__');
-	assert.equal(text, 'Dim a As Integer = __FB_DARWIN__');
+	assert.equal(text, 'dim a as integer = __FB_DARWIN__');
 });
 
 test('comments and string literals are left exactly as written', () => {
@@ -116,7 +116,7 @@ test('comments and string literals are left exactly as written', () => {
 test('line endings and untouched text are preserved byte for byte', () => {
 	const source = ['dim x as integer', '', "' \u00e9\u00e0\u00fc comment", 'x = 1'].join('\r\n');
 	const { text } = format(source);
-	assert.equal(text, ['Dim x As Integer', '', "' \u00e9\u00e0\u00fc comment", 'x = 1'].join('\r\n'));
+	assert.equal(text, ['dim x as integer', '', "' \u00e9\u00e0\u00fc comment", 'x = 1'].join('\r\n'));
 });
 
 test('formatting is idempotent', () => {
@@ -132,7 +132,7 @@ test('formatting is idempotent', () => {
 
 test('an empty document and a document with nothing to fix are unchanged', () => {
 	assert.deepEqual(capitalizeIdentifiers(''), { text: '', changes: 0 });
-	const clean = 'Sub Main()\nEnd Sub';
+	const clean = 'sub Main()\nend sub';
 	assert.deepEqual(capitalizeIdentifiers(clean), { text: clean, changes: 0 });
 });
 

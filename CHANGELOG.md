@@ -43,6 +43,12 @@ release was a syntax-highlighting-only TextMate grammar.
   are comments and string literals. Available on the editor context menu, in the
   command palette, and through *Format Document* / *Format Selection*.
 
+- **Language keywords are lower case**, the style fbc's own source is written in:
+  `dim`, `print`, `if`, `end sub`, `select case`. Runtime library routines keep
+  the spelling their own headers use (`Left`, `ScreenRes`, `GetMouse`), and the
+  intrinsic defines keep their upper case. Completion, the block scaffolds and
+  Format Text all agree, so what the list shows is what gets inserted.
+
 ### Fixed
 
 - **Type names are highlighted consistently.** The grammar scoped a type name

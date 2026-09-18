@@ -96,33 +96,33 @@ test('blocks come from the manual, opener and closer paired', () => {
 	assert.deepEqual(
 		[...byOpener.keys()].sort(),
 		[
-			'Constructor',
-			'Destructor',
-			'Do',
-			'Enum',
-			'Extern',
-			'For',
-			'Function',
-			'If',
-			'Namespace',
-			'Operator',
-			'Property',
-			'Scope',
-			'Select Case',
-			'Sub',
-			'Type',
-			'While',
-			'With',
+			'constructor',
+			'destructor',
+			'do',
+			'enum',
+			'extern',
+			'for',
+			'function',
+			'if',
+			'namespace',
+			'operator',
+			'property',
+			'scope',
+			'select case',
+			'sub',
+			'type',
+			'while',
+			'with',
 		],
 	);
 	// the KeyPgEndblock list
-	assert.equal(byOpener.get('Function')?.closer, 'End Function');
-	assert.equal(byOpener.get('Select Case')?.closer, 'End Select');
-	assert.equal(byOpener.get('If')?.closer, 'End If');
+	assert.equal(byOpener.get('function')?.closer, 'end function');
+	assert.equal(byOpener.get('select case')?.closer, 'end select');
+	assert.equal(byOpener.get('if')?.closer, 'end if');
 	// loops close with a word of their own
-	assert.equal(byOpener.get('For')?.closer, 'Next');
-	assert.equal(byOpener.get('Do')?.closer, 'Loop');
-	assert.equal(byOpener.get('While')?.closer, 'Wend');
+	assert.equal(byOpener.get('for')?.closer, 'next');
+	assert.equal(byOpener.get('do')?.closer, 'loop');
+	assert.equal(byOpener.get('while')?.closer, 'wend');
 	for (const block of allBlocks()) {
 		assert.match(block.page, /^KeyPg/, `${block.opener} has no manual page`);
 	}
@@ -147,10 +147,10 @@ test('names are identifiers, not manual page titles', () => {
 	assert.equal(isCompletableName('__FB_DARWIN__'), true);
 });
 
-test('blocks are capitalised, and their snippets match', () => {
+test('blocks are lower case, and their snippets match', () => {
 	for (const block of allBlocks()) {
-		assert.match(block.opener, /^[A-Z]/, `${block.opener} opens a block`);
-		assert.match(block.closer, /^[A-Z]/, `${block.closer} closes it`);
+		assert.match(block.opener, /^[a-z]/, `${block.opener} opens a block`);
+		assert.match(block.closer, /^[a-z]/, `${block.closer} closes it`);
 
 		const body = blockBody(block);
 		if (!body) continue;
@@ -166,11 +166,11 @@ test('blocks are capitalised, and their snippets match', () => {
 	}
 });
 
-test('continuations are capitalised', () => {
+test('continuations are lower case', () => {
 	const seen = blockContinuations(allBlocks());
 	assert.ok(seen.length >= allBlocks().length);
 	for (const { label, detail } of seen) {
-		assert.match(label, /^[A-Z]/, `"${label}" must be capitalised`);
+		assert.match(label, /^[a-z]/, `"${label}" must be lower case`);
 		assert.ok(detail.length > 0, `${label} has no detail`);
 	}
 });

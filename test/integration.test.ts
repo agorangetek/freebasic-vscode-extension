@@ -504,12 +504,12 @@ test('integration: extension host wiring', { skip: !esbuild && 'esbuild not inst
 		const provider = registrations.completion[0]!.provider;
 		const items = (provider.provideCompletionItems(doc, new Position(0, 3)) ??
 			[]) as CompletionItem[];
-		const fn = items.find((i) => i.label === 'Function');
-		assert.ok(fn, 'Function is offered');
+		const fn = items.find((i) => i.label === 'function');
+		assert.ok(fn, 'function is offered');
 		assert.ok(fn.insertText instanceof SnippetString);
 		assert.equal(
 			(fn.insertText as SnippetString).value,
-			'Function ${1:name}(${2}) As ${3:Integer}\n\t$0\nEnd Function',
+			'function ${1:name}(${2}) as ${3:integer}\n\t$0\nend function',
 		);
 	});
 
@@ -520,11 +520,11 @@ test('integration: extension host wiring', { skip: !esbuild && 'esbuild not inst
 		const items = (provider.provideCompletionItems(doc, new Position(1, 6)) ??
 			[]) as CompletionItem[];
 		const labels = items.map((i) => i.label);
-		assert.ok(labels.includes('Function'), labels.join(', '));
-		assert.ok(labels.includes('Sub'));
-		assert.ok(labels.includes('Select'));
-		assert.equal(items.find((i) => i.label === 'Function')?.detail, 'end Function');
-		assert.ok(!labels.includes('Dim'), 'ordinary keywords are not offered here');
+		assert.ok(labels.includes('function'), labels.join(', '));
+		assert.ok(labels.includes('sub'));
+		assert.ok(labels.includes('select'));
+		assert.equal(items.find((i) => i.label === 'function')?.detail, 'end function');
+		assert.ok(!labels.includes('dim'), 'ordinary keywords are not offered here');
 	});
 
 	await t.test('registers the Format Text command and a formatter', () => {
@@ -553,10 +553,10 @@ test('integration: extension host wiring', { skip: !esbuild && 'esbuild not inst
 		assert.equal(
 			appliedEdits[0]!.newText,
 			[
-				`Sub MySub(${byval} a As Integer)`,
-				'\tDim v As vec2',
+				`sub MySub(${byval} a as integer)`,
+				'\tdim v as vec2',
 				'\tScreenRes 640, 480',
-				'End Sub',
+				'end sub',
 			].join('\n'),
 		);
 	});
@@ -583,7 +583,7 @@ test('integration: extension host wiring', { skip: !esbuild && 'esbuild not inst
 
 		assert.equal(appliedEdits.length, 1);
 		assert.ok(
-			appliedEdits[0]!.newText.includes('\tDim d As Double = ScaleBy(2.0)'),
+			appliedEdits[0]!.newText.includes('\tdim d as double = ScaleBy(2.0)'),
 			appliedEdits[0]!.newText,
 		);
 	});
