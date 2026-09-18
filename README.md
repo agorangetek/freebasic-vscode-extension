@@ -34,6 +34,10 @@ Completion covers the whole language surface, not just keywords:
   The openers and their terminators are read from the manual's
   block-terminator page (`KeyPgEndblock`), which is the only place `end function`
   is documented — there is no page for the combination itself.
+* **Prefix filtering** — typing a character offers only what *starts* with it.
+  The editor's own filter is fuzzy and also matches inside a name, so `r` would
+  offer `ScreenRes`; the language service narrows the list itself, which the
+  editor can only reduce further.
 * **Call snippets** — functions with parameters insert a snippet with
   tab stops, e.g. `Left(str, n)` arrives as `Left(${1:str}, ${2:n})`.
 * **Smart casing** — completion matches however you type, but always inserts the

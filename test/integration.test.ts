@@ -460,12 +460,25 @@ test('integration: extension host wiring', { skip: !esbuild && 'esbuild not inst
 
 	await t.test('completes symbols from other workspace files', async () => {
 		await commands.get('freebasic.reindex')!();
-		const items = completeAt(9, 2);
+		// on an empty line, with nothing typed, so nothing is filtered out
+		const items = completeAt(10, 0);
 		assert.ok(
 			labels(items).includes('otherProc'),
 			`expected otherProc in ${labels(items).join(', ')}`,
 		);
 		assert.ok(infoMessages.some((m) => /indexed \d+ files/.test(m)));
+	});
+
+	await t.test('typing a character offers only what starts with it', () => {
+		// cursor after the "myS" already on line 9
+		const items = completeAt(9, 3);
+		const found = labels(items);
+		assert.ok(found.includes('mySub'), `expected mySub in ${found.join(', ')}`);
+		assert.ok(
+			!found.includes('otherProc'),
+			'otherProc does not start with myS and must not be offered',
+		);
+		assert.ok(!found.includes('Abs'), 'nor anything else that merely contains it');
 	});
 
 	await t.test('hovers built-ins with manual documentation', () => {

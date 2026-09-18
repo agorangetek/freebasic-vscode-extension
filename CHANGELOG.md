@@ -56,6 +56,13 @@ release was a syntax-highlighting-only TextMate grammar.
   `variable.other.member.freebasic`, variables are `variable.other.freebasic`,
   which a theme normally paints the same way.
 
+- **Completion filters by prefix.** Typing a character now offers only the names
+  that start with it. The editor's own filter is fuzzy and also matches at a word
+  boundary inside a name, so `r` would offer `ScreenRes` and `e` would offer
+  `Parse`; the language service narrows the list to prefix matches before the
+  editor sees it, and the prefix is what has actually been typed rather than the
+  whole word under the cursor.
+
 ### Fixed
 
 - **Type names are highlighted consistently.** The grammar scoped a type name

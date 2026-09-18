@@ -303,7 +303,11 @@ export function activate(context: vscode.ExtensionContext): void {
 
 					const parsed = indexOf(document);
 					const wordRange = document.getWordRangeAtPosition(position, /[A-Za-z_][A-Za-z0-9_]*/);
-					const word = wordRange ? document.getText(wordRange) : '';
+					// Only what has actually been typed: the word range spans the whole
+					// word, which may extend past the cursor when editing mid-word.
+					const word = wordRange
+						? document.getText(new vscode.Range(wordRange.start, position))
+						: '';
 
 					const items = buildCompletions({
 						document: parsed,

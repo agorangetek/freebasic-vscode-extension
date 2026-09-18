@@ -291,5 +291,13 @@ export function buildCompletions(request: CompletionRequest): FbCompletionItem[]
 		}
 	}
 
+	// 9. only what the typed text starts. The editor's own filter is fuzzy -- it
+	// also matches at a word boundary inside a name, so "r" offers ScreenRes --
+	// which is not what "type a character, get what starts with it" means.
+	if (word.length > 0) {
+		const prefix = word.toLowerCase();
+		return items.filter((item) => (item.filterText ?? item.label).toLowerCase().startsWith(prefix));
+	}
+
 	return items;
 }

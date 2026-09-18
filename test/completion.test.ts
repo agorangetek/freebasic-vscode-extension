@@ -42,7 +42,7 @@ test('completion offers locals, module symbols, built-ins and keywords', () => {
 	const items = buildCompletions({
 		document: doc,
 		position: { line: 7, character: 2 }, // inside greet()
-		word: 'g',
+		word: '',
 		options: OPTIONS,
 	});
 	const labels = new Set(items.map((i) => i.label));
@@ -335,4 +335,32 @@ test('block continuations are spelled like the block they close', () => {
 	for (const extra of ['else', 'elseif', 'case', 'case else', 'continue', 'exit']) {
 		assert.ok(labels.includes(extra), `${extra} is offered`);
 	}
+});
+
+test('only items that start with the typed text are offered', () => {
+	const doc = parseDocument('file:///m.bas', MODULE);
+	const labelsFor = (word: string) =>
+		new Map(
+			buildCompletions({
+				document: doc,
+				position: { line: 7, character: 2 },
+				word,
+				options: OPTIONS,
+			}).map((i) => [i.label, i]),
+		);
+
+	const s = labelsFor('s');
+	assert.ok(s.has('ScreenRes'), 'a name starting with s is offered');
+	assert.ok(!s.has('Abs'), 'a name that merely contains s is not');
+	assert.ok(!s.has('greeting'), 'nor one that merely contains s later');
+
+	const le = labelsFor('le');
+	assert.ok(le.has('Left'));
+	assert.ok(!le.has('ScreenRes'), 'typing more narrows the list');
+
+	// the editor matches case-insensitively, and so does this
+	assert.ok(labelsFor('SC').has('ScreenRes'));
+
+	// with nothing typed, nothing is filtered
+	assert.ok(labelsFor('').has('Abs'));
 });
