@@ -1,14 +1,17 @@
 /*
  * Tests for the canonical-casing rewrite behind the "Format Text" command.
+ *
+ * Three sources of spelling, in priority order: the author's procedures and
+ * types (first letter capitalised), the manual's built-ins and block keywords,
+ * and the author's variables and constants (which are never touched).
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { capitalizeIdentifiers } from '../src/service/casing.ts';
+import { capitalizeFirst, capitalizeIdentifiers } from '../src/service/casing.ts';
 import { parseDocument } from '../src/service/parser.ts';
 
 function format(source: string) {
-	const declared = parseDocument('file:///x.bas', source).symbols.map((s) => s.name);
-	return capitalizeIdentifiers(source, declared);
+	return capitalizeIdentifiers(source, parseDocument('file:///x.bas', source).symbols);
 }
 
 test('keywords, datatypes and built-in functions get their canonical spelling', () => {
@@ -17,9 +20,80 @@ test('keywords, datatypes and built-in functions get their canonical spelling', 
 	);
 	assert.equal(
 		text,
-		['Sub main()', '\tDim x As Double', '\tScreenRes 640, 480', '\tPrint Left("abc", 2)', 'End Sub'].join('\n'),
+		[
+			'Sub Main()',
+			'\tDim x As Double',
+			'\tScreenRes 640, 480',
+			'\tPrint Left("abc", 2)',
+			'End Sub',
+		].join('\n'),
 	);
-	assert.equal(changes, 9);
+	assert.equal(changes, 10);
+});
+
+test('procedures and types are capitalised, wherever they are written', () => {
+	const source = [
+		'type vec2',
+		'\tx as double',
+		'end type',
+		'function scaleby(byref v as vec2) as vec2',
+		'\treturn v.x',
+		'end function',
+		'sub main()',
+		'\tdim p as vec2',
+		'\tscaleby p',
+		'\tSCALEBY p',
+		'end sub',
+	].join('\n');
+	const { text } = format(source);
+	assert.ok(text.includes('Type Vec2'), text);
+	assert.ok(text.includes('Function Scaleby(ByRef v As Vec2) As Vec2'), text);
+	assert.ok(text.includes('\tDim p As Vec2'), text);
+	// every spelling of the call converges on the declaration's capitalised one
+	assert.ok(text.includes('\tScaleby p'), text);
+	assert.ok(!text.includes('scaleby'), text);
+	assert.ok(!text.includes('vec2'), text);
+});
+
+test('variables, constants and labels are left exactly as written', () => {
+	const source = [
+		'const WIDTH = 640',
+		'const maxSize = 10',
+		'sub main()',
+		'\tdim MyLocal as integer',
+		'\tdim other as integer',
+		'\tfor i as integer = 0 to maxSize',
+		'\t\tMyLocal = Other',
+		'\tnext i',
+		'top:',
+		'\tgoto top',
+		'end sub',
+	].join('\n');
+	const { text } = format(source);
+	for (const untouched of ['WIDTH', 'maxSize', 'MyLocal', 'other', 'Other', 'i', 'top']) {
+		assert.ok(text.includes(untouched), `${untouched} was rewritten:\n${text}`);
+	}
+	// ... while the language around them is still fixed
+	assert.ok(text.includes('Const WIDTH = 640'), text);
+	assert.ok(text.includes('\tFor i As Integer = 0 To maxSize'), text);
+});
+
+test('a local shadowing a built-in keeps the built-in out of the file', () => {
+	// "left" is declared, so the formatter cannot tell the variable from the
+	// function and leaves both alone rather than guessing
+	const source = [
+		'sub main()',
+		'\tdim left as integer',
+		'\tleft = 1',
+		'\tprint left',
+		'end sub',
+	].join('\n');
+	const { text } = format(source);
+	assert.ok(text.includes('\tDim left As Integer'), text);
+	assert.ok(text.includes('\tPrint left'), text);
+	// the surrounding keywords are still corrected
+	assert.ok(text.includes('Sub Main()'), text);
+	assert.ok(text.includes('\tPrint left'), text);
 });
 
 test('intrinsic defines keep their upper case', () => {
@@ -39,34 +113,6 @@ test('comments and string literals are left exactly as written', () => {
 	assert.ok(text.includes('"left( dim"'));
 });
 
-test('the author\'s own names are left exactly as written', () => {
-	const source = [
-		'type Vec2',
-		'\tx as double',
-		'end type',
-		'function ScaleBy(byref v as vec2) as VEC2',
-		'\treturn v.x',
-		'end function',
-		'sub main()',
-		'\tdim p as vec2',
-		'\tscaleby p',
-		'\tScaleBy p',
-		'end sub',
-	].join('\n');
-	const { text } = format(source);
-	// keywords and datatypes are fixed ...
-	assert.ok(text.includes('End Type'), text);
-	assert.ok(text.includes('Function ScaleBy('), text);
-	assert.ok(text.includes('\tReturn v.x'), text);
-	assert.ok(text.includes('\nSub main()'), text);
-	// ... and not one spelling of a declared name is touched, however it is
-	// written: the declaration, a lowercase use and a capitalised use all
-	// survive side by side
-	for (const untouched of ['ScaleBy(', 'vec2', 'VEC2', 'scaleby p', 'ScaleBy p']) {
-		assert.ok(text.includes(untouched), `${untouched} was rewritten:\n${text}`);
-	}
-});
-
 test('line endings and untouched text are preserved byte for byte', () => {
 	const source = ['dim x as integer', '', "' \u00e9\u00e0\u00fc comment", 'x = 1'].join('\r\n');
 	const { text } = format(source);
@@ -76,56 +122,25 @@ test('line endings and untouched text are preserved byte for byte', () => {
 test('formatting is idempotent', () => {
 	const source = ['sub a()', '\tdim v as vec2', '\tscreenres 1, 2', 'end sub'].join('\n');
 	const once = format(source);
-	const twice = capitalizeIdentifiers(once.text, ['a', 'v']);
+	const twice = capitalizeIdentifiers(
+		once.text,
+		parseDocument('file:///x.bas', once.text).symbols,
+	);
 	assert.equal(twice.changes, 0, twice.text);
 	assert.equal(twice.text, once.text);
 });
 
 test('an empty document and a document with nothing to fix are unchanged', () => {
 	assert.deepEqual(capitalizeIdentifiers(''), { text: '', changes: 0 });
-	const clean = 'Sub main()\nEnd Sub';
+	const clean = 'Sub Main()\nEnd Sub';
 	assert.deepEqual(capitalizeIdentifiers(clean), { text: clean, changes: 0 });
 });
 
-test('a declared symbol is never rewritten, even to a built-in spelling', () => {
-	// "Name" is a built-in statement (rename a file), but the author's own
-	// procedure is called "name" and must keep that spelling -- in every
-	// direction, so a capitalised use is left alone too
-	const source = [
-		'function name() as double',
-		'\treturn 1.0',
-		'end function',
-		'',
-		'sub main()',
-		'\tprint name()',
-		'\tprint Name()',
-		'end sub',
-	].join('\n');
-	const { text } = format(source);
-	assert.ok(text.includes('Function name() As Double'), text);
-	assert.ok(text.includes('\tPrint name()'), text);
-	assert.ok(text.includes('\tPrint Name()'), 'a capitalised use is left alone');
-	assert.ok(!text.includes('Function Name('), text);
-});
-
-test('built-ins are still capitalised when nothing declares them', () => {
-	const { text } = format(['sub main()', '\tdim s as string', '\tname "a" as "b"', 'end sub'].join('\n'));
-	assert.ok(text.includes('\tName "a" As "b"'), text);
-});
-
-test('a declared name shadowing a built-in keeps its spelling on both sides', () => {
-	const source = [
-		'function left(byval s as string) as string',
-		'\treturn s',
-		'end function',
-		'sub main()',
-		'\tprint left("abc")',
-		'\tprint Left("abc")',
-		'end sub',
-	].join('\n');
-	const { text } = format(source);
-	assert.ok(text.includes('Function left('), text);
-	assert.ok(text.includes(') As String'), text);
-	assert.ok(text.includes('\tPrint left("abc")'), text);
-	assert.ok(text.includes('\tPrint Left("abc")'), text);
+test('capitalizeFirst only touches the first letter', () => {
+	assert.equal(capitalizeFirst('drawBox'), 'DrawBox');
+	assert.equal(capitalizeFirst('main'), 'Main');
+	assert.equal(capitalizeFirst('MAXSIZE'), 'MAXSIZE');
+	assert.equal(capitalizeFirst('scale_by'), 'Scale_by');
+	assert.equal(capitalizeFirst('_private'), '_private');
+	assert.equal(capitalizeFirst(''), '');
 });

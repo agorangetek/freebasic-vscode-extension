@@ -7,6 +7,7 @@
 import * as vscode from 'vscode';
 import { builtinCount, builtinSource } from './service/builtins.ts';
 import { capitalizeIdentifiers } from './service/casing.ts';
+import { parseDocument } from './service/parser.ts';
 import { buildCompletions } from './service/completion.ts';
 import { getHover } from './service/hover.ts';
 import { FbIndex } from './service/index.ts';
@@ -187,17 +188,57 @@ export function activate(context: vscode.ExtensionContext): void {
 
 	/* ------------------------------------------------ format / capitalize */
 
+	/**
+	 * Every symbol visible in `document`: its own, plus those of the files it
+	 * `#include`s, which are the same translation unit. Without following the
+	 * includes, a procedure declared in a .bi could not be recognised as one
+	 * from the file that calls it.
+	 */
+	async function translationUnitSymbols(document: vscode.TextDocument): Promise<FbSymbol[]> {
+		const symbols: FbSymbol[] = [];
+		const seen = new Set<string>();
+		const queue: { uri: vscode.Uri; text: string; depth: number }[] = [
+			{ uri: document.uri, text: document.getText(), depth: 0 },
+		];
+
+		while (queue.length > 0 && seen.size < 32) {
+			const current = queue.shift()!;
+			const key = current.uri.toString();
+			if (seen.has(key) || current.depth > 6) continue;
+			seen.add(key);
+
+			let parsed: FbDocument;
+			try {
+				parsed = parseDocument(key, current.text);
+			} catch {
+				continue;
+			}
+			symbols.push(...parsed.symbols);
+
+			for (const include of parsed.includes) {
+				const target = vscode.Uri.joinPath(current.uri, '..', include);
+				try {
+					const bytes = await vscode.workspace.fs.readFile(target);
+					queue.push({
+						uri: target,
+						text: Buffer.from(bytes).toString('utf8'),
+						depth: current.depth + 1,
+					});
+				} catch {
+					// a system header, or somewhere we cannot read: nothing to add
+				}
+			}
+		}
+		return symbols;
+	}
+
 	/** Rewrite canonical spellings inside `range`, as a single replacement. */
-	function capitalizationEdits(
+	async function capitalizationEdits(
 		document: vscode.TextDocument,
 		range: vscode.Range,
-	): { edit: vscode.TextEdit; changes: number } | undefined {
+	): Promise<{ edit: vscode.TextEdit; changes: number } | undefined> {
 		const source = document.getText(range);
-		const parsed = indexOf(document);
-		const result = capitalizeIdentifiers(
-			source,
-			parsed.symbols.map((s) => s.name),
-		);
+		const result = capitalizeIdentifiers(source, await translationUnitSymbols(document));
 		if (result.changes === 0) return undefined;
 		return { edit: vscode.TextEdit.replace(range, result.text), changes: result.changes };
 	}
@@ -215,7 +256,7 @@ export function activate(context: vscode.ExtensionContext): void {
 					editor.document.positionAt(editor.document.getText().length),
 				);
 
-			const result = capitalizationEdits(editor.document, range);
+			const result = await capitalizationEdits(editor.document, range);
 			if (!result) {
 				void vscode.window.showInformationMessage('FreeBASIC: nothing to capitalize.');
 				return;
@@ -231,8 +272,8 @@ export function activate(context: vscode.ExtensionContext): void {
 	// also reachable through Format Document / Format Selection
 	const formattingProvider: vscode.DocumentFormattingEditProvider &
 		vscode.DocumentRangeFormattingEditProvider = {
-		provideDocumentFormattingEdits(document) {
-			const result = capitalizationEdits(
+		async provideDocumentFormattingEdits(document) {
+			const result = await capitalizationEdits(
 				document,
 				new vscode.Range(
 					document.positionAt(0),
@@ -241,8 +282,8 @@ export function activate(context: vscode.ExtensionContext): void {
 			);
 			return result ? [result.edit] : [];
 		},
-		provideDocumentRangeFormattingEdits(document, range) {
-			const result = capitalizationEdits(document, range);
+		async provideDocumentRangeFormattingEdits(document, range) {
+			const result = await capitalizationEdits(document, range);
 			return result ? [result.edit] : [];
 		},
 	};

@@ -52,9 +52,13 @@ FreeBASIC does not care about case, so the extension will fix it for you.
 It fixes the spelling of the *language* — keywords, datatypes, built-in
 functions and block terminators — and leaves everything else byte for byte:
 
-* **Your own names are never touched.** A procedure, type, constant, variable or
-  label declared in the file is skipped in every spelling, so `function name()`
-  keeps its lower case and a local `left` does not become `Left`.
+* **Your procedures and types get a capital first letter.** `drawBox` becomes
+  `DrawBox` in the declaration and at every call site, and `type vec2` becomes
+  `type Vec2`. Declarations are followed through `#include`, so a procedure
+  declared in a `.bi` is capitalised in the files that call it.
+* **Your variables, constants and labels are never touched** — `i`, `WIDTH` and
+  `myVar` are the author's business. A local `left` also keeps the built-in
+  `Left` out of the file, since the two cannot be told apart.
 * **Comments and string literals are never touched**, so `"screenres"` in a
   message or an `Alias` string stays as written.
 * **Line endings are preserved**, and running it twice changes nothing the

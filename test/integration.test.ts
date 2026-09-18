@@ -103,6 +103,14 @@ class Uri {
 	static parse(p: string) {
 		return new Uri(p.replace(/^file:\/\//, ''));
 	}
+	static joinPath(base: Uri, ...parts: string[]) {
+		const segments = base.fsPath.split('/').filter(Boolean);
+		for (const part of parts) {
+			if (part === '..') segments.pop();
+			else if (part !== '.') segments.push(part);
+		}
+		return new Uri('/' + segments.join('/'));
+	}
 	toString() {
 		return `file://${this.fsPath}`;
 	}
@@ -545,11 +553,38 @@ test('integration: extension host wiring', { skip: !esbuild && 'esbuild not inst
 		assert.equal(
 			appliedEdits[0]!.newText,
 			[
-				`Sub mySub(${byval} a As Integer)`,
+				`Sub MySub(${byval} a As Integer)`,
 				'\tDim v As vec2',
 				'\tScreenRes 640, 480',
 				'End Sub',
 			].join('\n'),
+		);
+	});
+
+	await t.test('a procedure declared in an included file is recognised', async () => {
+		// main.bas includes helper.bi; scaleBy is declared there, so its uses in
+		// main.bas are the author's procedure and get the same capitalisation
+		const helper = new TextDocument('/ws/helper.bi', [
+			'function scaleBy(byval v as double) as double',
+			'\treturn v',
+			'end function',
+		]);
+		const main = new TextDocument('/ws/uses.bas', [
+			'#include once "helper.bi"',
+			'sub main()',
+			'\tdim d as double = scaleBy(2.0)',
+			'end sub',
+		]);
+		vscodeMock.workspace.textDocuments.push(helper, main);
+		editor.document = main;
+		appliedEdits.length = 0;
+
+		await commands.get('freebasic.formatText')!();
+
+		assert.equal(appliedEdits.length, 1);
+		assert.ok(
+			appliedEdits[0]!.newText.includes('\tDim d As Double = ScaleBy(2.0)'),
+			appliedEdits[0]!.newText,
 		);
 	});
 

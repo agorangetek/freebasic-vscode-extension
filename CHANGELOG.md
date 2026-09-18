@@ -36,10 +36,12 @@ release was a syntax-highlighting-only TextMate grammar.
   runnable with `npm test` on stock Node (no VS Code required).
 
 - **Format Text** (`freebasic.formatText`): fixes the spelling of keywords,
-  datatypes, built-in functions and block terminators. Available on the editor
-  context menu, in the command palette, and through
-  *Format Document* / *Format Selection*. The author's own symbols are never
-  rewritten in any spelling, and neither are comments or string literals.
+  datatypes, built-in functions and block terminators, and capitalises the first
+  letter of the author's procedures and types (`drawBox` -> `DrawBox`) in the
+  declaration and at every call site, following `#include` to reach procedures
+  declared in another file. Variables, constants and labels are left alone, as
+  are comments and string literals. Available on the editor context menu, in the
+  command palette, and through *Format Document* / *Format Selection*.
 
 ### Fixed
 
