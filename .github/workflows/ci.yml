@@ -9,6 +9,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # test/*.test.ts is TypeScript executed directly by node.  Node strips
+      # types by default from 23.6 on, and Node 22 needs this flag; it is
+      # accepted (harmlessly) by newer versions too.
+      NODE_OPTIONS: --experimental-strip-types
     steps:
       - uses: actions/checkout@v4
 
@@ -29,7 +34,7 @@ jobs:
         run: npm run build
 
       - name: Package VSIX
-        run: npx vsce package --out freebasic.vsix
+        run: npm run package -- --out freebasic.vsix
 
       - uses: actions/upload-artifact@v4
         with:
