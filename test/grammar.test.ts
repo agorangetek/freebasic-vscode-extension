@@ -365,3 +365,68 @@ test('the catch-all does not swallow keywords, calls or labels', { skip }, async
 	const integer = builtin[0]!.find((t) => t.text.trim() === 'integer');
 	assert.ok(integer?.scopes.includes('storage.type.integer.freebasic'), 'integer stays a datatype');
 });
+
+/*
+ * Cast() and its siblings are keywords in the manual and in the compiler's own
+ * keyword table, but the operators rule claimed them, so the editor coloured
+ * them like "=" and "," -- which the Dark Modern theme renders in the plain
+ * foreground, i.e. indistinguishable from an identifier. The data said
+ * "keyword", completion showed a keyword icon, and the highlighting disagreed.
+ */
+const INTRINSIC_FIXTURE = [
+	'dim x as double = cast(double, 3)',
+	'y = cptr(byte ptr, 0)',
+	'z = sizeof(foo)',
+	'w = typeof(bar)',
+	'p = varptr(q)',
+	's = strptr(r)',
+	'f = procptr(baz)',
+].join('\n');
+
+test('intrinsic operators are keywords, not operators', { skip }, async () => {
+	const lines = await tokenize(INTRINSIC_FIXTURE);
+	for (const name of ['cast', 'cptr', 'sizeof', 'typeof', 'varptr', 'strptr', 'procptr']) {
+		const hits = occurrences(lines, name);
+		assert.ok(hits.length > 0, `${name} did not tokenize at all`);
+		for (const { token } of hits) {
+			const scopes = token.scopes.join(' ');
+			assert.ok(
+				token.scopes.some((s) => s.startsWith('keyword') && !s.startsWith('keyword.operator')),
+				`${name} should be scoped as a keyword, got: ${scopes}`,
+			);
+		}
+	}
+});
+
+test('the datatype argument of cast() and cptr() is a type', { skip }, async () => {
+	const lines = await tokenize(INTRINSIC_FIXTURE);
+	for (const [line, name] of [
+		[0, 'double'],
+		[1, 'byte'],
+	] as const) {
+		// "dim x as double = cast(double, 3)" has the name twice: the declared
+		// type and the cast argument. Only the latter is scoped by the cast rule.
+		const tokens = lines[line]!.filter((t) => t.text === name);
+		assert.ok(tokens.length > 0, `${name} was not tokenized on line ${line}`);
+		assert.ok(
+			tokens.some((t) => t.scopes.includes('storage.type.freebasic')),
+			`${name} in a cast should be scoped as a type, got: ${tokens
+				.map((t) => t.scopes.join(' '))
+				.join(' | ')}`,
+		);
+	}
+});
+
+test('word and symbol operators keep the operator scope', { skip }, async () => {
+	const lines = await tokenize('dim a as long = 1 + 2, 3\nb = a mod 2 and a or not a');
+	for (const op of ['=', '+', ',', 'mod', 'and', 'or', 'not']) {
+		const hits = occurrences(lines, op);
+		assert.ok(hits.length > 0, `${op} was not tokenized`);
+		for (const { token } of hits) {
+			assert.ok(
+				token.scopes.includes('keyword.operator.freebasic'),
+				`${op} should stay an operator, got: ${token.scopes.join(' ')}`,
+			);
+		}
+	}
+});

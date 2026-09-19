@@ -290,6 +290,14 @@
 			"patterns": [
 				{ "include": "#literals" },
 				{ "include": "#operators" },
+				{
+					"comment": "The first argument of Cast() and CPtr() is a datatype, not an expression.",
+					"match": "(?i)(\\b(?:cast|cptr)\\s*\\()\\s*([a-z_][a-z0-9_]*)",
+					"captures": {
+						"1": { "name": "keyword.other.intrinsic.freebasic" },
+						"2": { "name": "storage.type.freebasic" }
+					}
+				},
 				{ "include": "#single-quote-comments"},
 				{ "include": "#keywords"},
 				{
@@ -542,7 +550,7 @@
 		
 		"operators": {
 			"name": "keyword.operator.freebasic",
-			"match": "(?i)(?:\\b(?:cast|procptr|strptr|varptr|new|delete|mod|shl|shr|not|and|or|eqv|imp|xor|let|andalso|orelse)\\b|=>?|\\.|->|<>|[<>]=?|\\+|-|\\*|/|\\\\|\\^|@|&|,|;)"
+			"match": "(?i)(?:\\b(?:new|delete|mod|shl|shr|not|and|or|eqv|imp|xor|let|andalso|orelse)\\b|=>?|\\.|->|<>|[<>]=?|\\+|-|\\*|/|\\\\|\\^|@|&|,|;)"
 		},
 
 		"declarations": {
@@ -1293,6 +1301,7 @@
 		"keywords": {
 			"patterns": [
 				{ "include": "#special-keywords" },
+				{ "include": "#intrinsic-keywords" },
 				{ "include": "#array-keywords" },
 				{ "include": "#bit-manipulation-keywords" },
 				{ "include": "#date-time-keywords" },
@@ -1352,7 +1361,11 @@
 		},
 		"miscellaneous-keywords": {
 			"name": "support.function.freebasic",
-			"match": "(?i)\\b(?:assert|assertwarn|data|offsetof|read|restore|sizeof|typeof)\\b"
+			"match": "(?i)\\b(?:assert|assertwarn|data|offsetof|read|restore)\\b"
+		},
+		"intrinsic-keywords": {
+			"name": "keyword.other.intrinsic.freebasic",
+			"match": "(?i)\\b(?:cast|cptr|procptr|strptr|varptr|sizeof|typeof)\\b"
 		},
 		"special-keywords": {
 			"patterns": [
