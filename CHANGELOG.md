@@ -4,6 +4,27 @@ All notable changes to the "freebasic" extension will be documented in this file
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.2.1] - 2026-09-20
+
+### Fixed
+
+- **Typing `str`, `left`, `mid`, `len` or any other String library command never brought up
+  the completion list.** Two scopes put the word `string` in front of the editor: the
+  library group `support.function.string.freebasic` and the type
+  `storage.type.string.freebasic`. VS Code derives the suggestions category of the token
+  under the caret from its *innermost* scope with
+  `/\b(comment|string|regex|regexp)\b/`, and string suggestions default to off, so the
+  editor classified code as a string literal and never asked the extension. They are now
+  `support.function.stringlib.freebasic` and `storage.type.stringtype.freebasic`; a theme
+  that targeted either old name needs the new one.
+- Two library scopes were misspelled `frebasic` (`support.function.input-output.frebasic`
+  and `support.function.string.frebasic`), so no theme could colour those rules.
+
+### Added
+
+- Regression tests that tokenize all 884 built-in names and fail if any of them is
+  classified as a string or a comment -- the trap above cannot come back unnoticed.
+
 ## [0.2.0] - 2026-09-20
 
 Modernization of the extension into a full language service. The previous

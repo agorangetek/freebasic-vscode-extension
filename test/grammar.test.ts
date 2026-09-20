@@ -149,8 +149,8 @@ test('built-in datatypes keep their precise storage.type scope', { skip }, async
 		Double: 'storage.type.floating-point.freebasic',
 		single: 'storage.type.floating-point.freebasic',
 		integer: 'storage.type.integer.freebasic',
-		string: 'storage.type.string.freebasic',
-		zstring: 'storage.type.string.freebasic',
+		string: 'storage.type.stringtype.freebasic',
+		zstring: 'storage.type.stringtype.freebasic',
 	};
 	for (const [name, scope] of Object.entries(expected)) {
 		for (const { line, token } of occurrences(lines, name)) {
@@ -272,7 +272,7 @@ test('calls to unknown procedures are scoped, built-ins keep their own', { skip 
 	const print = lines[7]!.find((t) => t.text.includes('print'));
 	assert.ok(print?.scopes.includes('support.function.console.freebasic'), 'print lost its scope');
 	const left = lines[7]!.find((t) => t.text.includes('Left'));
-	assert.ok(left?.scopes.includes('support.function.string.freebasic'), 'Left lost its scope');
+	assert.ok(left?.scopes.includes('support.function.stringlib.freebasic'), 'Left lost its scope');
 	const cls = lines[8]!.find((t) => t.text.includes('cls'));
 	assert.ok(cls?.scopes.includes('support.function.graphics.freebasic'), 'cls lost its scope');
 });
@@ -570,4 +570,73 @@ test('static opens a procedure body when a procedure follows', { skip }, async (
 		`static should stay a modifier, got ${stat?.scopes.join(' ') || 'no scope'}`,
 	);
 	assert.equal(codeTokens(lines).length, 1, 'its "end sub" should be one token');
+});
+
+/*
+ * VS Code chooses which editor.quickSuggestions entry applies to a keystroke by
+ * deriving a "standard token type" from the INNERMOST scope of the token at the
+ * caret, matching /\b(comment|string|regex|regexp)\b/ (getStandardTokenType in
+ * the editor's tokenMetadata).  Strings and comments default to "off", so a code
+ * scope that contains one of those words as a whole word stops the suggestion
+ * widget from opening while typing.  FreeBASIC's String library used to be
+ * scoped support.function.string.freebasic and the String type
+ * storage.type.string.freebasic, so typing `str` -- a command -- classified the
+ * caret as a string and no list ever appeared.  These tests keep every code
+ * scope out of that trap.
+ */
+const RESERVED_TOKEN_TYPE = /\b(comment|string|regex|regexp)\b/;
+
+/** The scope VS Code reads the quickSuggestions category from. */
+function quickSuggestionsCategory(token: Token): string {
+	const innermost = token.scopes[token.scopes.length - 1] ?? 'source.freebasic';
+	return innermost.match(RESERVED_TOKEN_TYPE)?.[1] ?? 'other';
+}
+
+test('no built-in command or keyword is tokenized as a string or a comment', { skip }, async () => {
+	const data = JSON.parse(
+		readFileSync(join(root, 'src', 'data', 'fb-builtins.json'), 'utf8'),
+	) as { items: { name: string }[]; keywords: string[] };
+	const names = [...data.items.map((item) => item.name), ...data.keywords];
+
+	const lines = await tokenize(names.join('\n'));
+	const offenders: string[] = [];
+	lines.forEach((tokens, line) => {
+		for (const token of tokens) {
+			if (token.text.trim() !== names[line]) continue;
+			if (quickSuggestionsCategory(token) !== 'other') {
+				offenders.push(`${names[line]} -> ${token.scopes.join(' ')}`);
+			}
+		}
+	});
+
+	assert.deepEqual(
+		offenders,
+		[],
+		`typing these names would suppress the suggestion popup: ${offenders.join(', ')}`,
+	);
+});
+
+test('a String library command and the String type still pop up suggestions', { skip }, async () => {
+	const lines = await tokenize(['dim s as string', '\tprint left("abc", 1)', '\tprint str(1)'].join('\n'));
+
+	for (const name of ['string', 'left', 'str']) {
+		const token = occurrences(lines, name).find(({ token }) => token.text.trim() === name)?.token;
+		assert.ok(token, `${name} did not tokenize`);
+		assert.equal(
+			quickSuggestionsCategory(token),
+			'other',
+			`"${name}" scopes as ${token.scopes.join(' ')}, so the editor would treat it as a string/comment and never pop up`,
+		);
+	}
+});
+
+test('string and comment literals are still classified as such', { skip }, async () => {
+	const lines = await tokenize(['print "left"', "' left"].join('\n'));
+
+	const literal = occurrences(lines, 'left').find(({ line }) => line === 0)?.token;
+	const comment = occurrences(lines, 'left').find(({ line }) => line === 1)?.token;
+	assert.ok(literal && comment, 'the sample did not tokenize');
+
+	assert.equal(quickSuggestionsCategory(literal), 'string');
+	assert.equal(quickSuggestionsCategory(comment), 'comment');
 });

@@ -536,7 +536,7 @@
 			"match": "(?i)\\bboolean\\b"
 		},
 		"string-types": {
-			"name": "storage.type.string.freebasic",
+			"name": "storage.type.stringtype.freebasic",
 			"match": "(?i)\\b[zw]?string\\b"
 		},
 		"procedure-types": {
@@ -1361,7 +1361,7 @@
 			"match": "(?i)\\b(?:beep|chain|chdir|command|curdir|dir|environ|exec|exepath|fileattr|filecopy|filedatetime|fileexists|fileflush|filelen|fileseteof|fre|isredirected|kill|mkdir|name|rmdir|run|shell|setenviron|sleep)\\b"
 		},
 		"string-keywords": {
-			"name": "support.function.string.freebasic",
+			"name": "support.function.stringlib.freebasic",
 			"match": "(?i)\\b(?:asc|bin|chr|cvd|cvi|cvl|cvlongint|cvs|cvshort|hex|instr|instrrev|lcase|left|len|lset|ltrim|mkd|mki|mkl|mklongint|mks|mkshort|mid|oct|right|rset|rtrim|space|str|ucase|val|valint|vallng|valuint|valulng|wbin|wchr|whex|woct|wspace|wstr)\\b"
 		},
 		"threading-keywords": {
@@ -1413,7 +1413,7 @@
 		"open-keyword": {
 			"begin": "(?i)\\b(open)\\b",
 			"beginCaptures": {
-				"1": { "name": "support.function.input-output.frebasic" }
+				"1": { "name": "support.function.input-output.freebasic" }
 			},
 			"end": ":|(?<!_)[ \t]*\n",
 			"patterns": [
@@ -1479,7 +1479,7 @@
 		"format-keyword": {
 			"begin": "(?i)\\b(format)[ \t]*\\(",
 			"beginCaptures": {
-				"1": { "name": "support.function.string.frebasic" }
+				"1": { "name": "support.function.stringlib.freebasic" }
 			},
 			"end": "\\)",
 			"patterns": [

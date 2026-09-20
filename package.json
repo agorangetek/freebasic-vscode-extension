@@ -2,7 +2,7 @@
 	"name": "freebasic",
 	"displayName": "FreeBASIC",
 	"description": "FreeBASIC language support for Visual Studio Code: code completion, hover, signature help and document outline.",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"publisher": "sorucoder",
 	"license": "MIT",
 	"engines": {
