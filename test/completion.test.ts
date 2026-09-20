@@ -17,7 +17,7 @@ const MODULE = [
 	'  return x + y',
 	'end function',
 	'',
-	'sub greet(byref name as string)',
+	'sub greet(byref who as string)',
 	'  dim greeting as string',
 	'  greeting = "hi"',
 	'end sub',
@@ -37,6 +37,24 @@ test('enclosingProcedure finds the procedure containing a line', () => {
 	assert.equal(enclosingProcedure(doc, { line: 0, character: 0 }), undefined);
 });
 
+test('locals are not offered once their procedure has ended', () => {
+	const doc = parseDocument('file:///m.bas', MODULE);
+	const lastLine = MODULE.split('\n').length - 1;
+	assert.equal(enclosingProcedure(doc, { line: lastLine, character: 0 }), undefined);
+
+	const items = buildCompletions({
+		document: doc,
+		position: { line: lastLine, character: 0 },
+		word: '',
+		options: OPTIONS,
+	});
+	const labels = new Set(items.map((i) => i.label));
+	assert.ok(!labels.has('greeting'), "greet()'s local must not leak past `end sub`");
+	assert.ok(!labels.has('who'), 'its parameter must not leak either');
+	// module-level symbols are still there
+	assert.ok(labels.has('LIMIT'));
+});
+
 test('completion offers locals, module symbols, built-ins and keywords', () => {
 	const doc = parseDocument('file:///m.bas', MODULE);
 	const items = buildCompletions({
@@ -48,18 +66,18 @@ test('completion offers locals, module symbols, built-ins and keywords', () => {
 	const labels = new Set(items.map((i) => i.label));
 
 	assert.ok(labels.has('greeting'), 'local variable should be completed');
-	assert.ok(labels.has('name'), 'procedure parameter should be completed');
+	assert.ok(labels.has('who'), 'procedure parameter should be completed');
 	assert.ok(labels.has('add'), 'module-level function should be completed');
 	assert.ok(labels.has('LIMIT'), 'constant should be completed');
 	assert.ok(labels.has('Vec2'), 'user type should be completed');
-	assert.ok(labels.has('Left'), 'built-in function should be completed');
-	assert.ok(labels.has('ScreenRes'), 'keyword/statement should be completed');
+	assert.ok(labels.has('left'), 'built-in function should be completed');
+	assert.ok(labels.has('screenres'), 'keyword/statement should be completed');
 
 	// ranking: locals before module symbols before built-ins
 	const rank = (label: string) => items.find((i) => i.label === label)!.sortText;
 	assert.ok(rank('greeting') < rank('add'), 'locals should sort before module symbols');
-	assert.ok(rank('add') < rank('Left'), 'module symbols should sort before built-ins');
-	assert.ok(rank('Left') < rank('ScreenRes'), 'built-ins should sort before keywords');
+	assert.ok(rank('add') < rank('left'), 'module symbols should sort before built-ins');
+	assert.ok(rank('left') < rank('screenres'), 'built-ins should sort before keywords');
 });
 
 test('no duplicates in the completion list', () => {
@@ -160,7 +178,7 @@ test('signature help resolves built-ins and user procedures', () => {
 
 	const builtin = getSignatureHelp(doc, { line: offset + 1, character: 14 });
 	assert.ok(builtin);
-	assert.match(builtin.label, /Left/);
+	assert.match(builtin.label, /^left\(/);
 	assert.equal(builtin.parameters.length, 2);
 
 	const user = getSignatureHelp(doc, { line: offset + 2, character: 12 });
@@ -293,7 +311,7 @@ test('after "as" only types are offered', () => {
 test('mid-expression drops statement keywords but keeps operators', () => {
 	const items = complete(3, 14);
 	const labels = items.map((i) => i.label);
-	assert.ok(labels.includes('Abs'), 'functions are always available');
+	assert.ok(labels.includes('abs'), 'functions are always available');
 	assert.ok(labels.includes('mod'), 'operators are valid in an expression');
 	assert.ok(labels.includes('cast'));
 	assert.ok(!labels.includes('dim'), 'dim cannot appear mid-expression');
@@ -315,7 +333,7 @@ test('declaration prefixes get the bare keyword, not a block', () => {
 });
 
 test('what gets inserted is spelled like the label that was offered', () => {
-	// the popup shows "Function" or "End If"; inserting "function" would be a
+	// the popup shows "function" or "end if"; inserting "Function" would be a
 	// different token as far as the reader is concerned
 	const items = [...complete(1, 2), ...complete(4, 6)];
 	assert.ok(items.length > 100, 'expected a large list to check');
@@ -350,22 +368,22 @@ test('only items that start with the typed text are offered', () => {
 		);
 
 	const s = labelsFor('s');
-	assert.ok(s.has('ScreenRes'), 'a name starting with s is offered');
-	assert.ok(!s.has('Abs'), 'a name that merely contains s is not');
+	assert.ok(s.has('screenres'), 'a name starting with s is offered');
+	assert.ok(!s.has('abs'), 'a name that merely contains s is not');
 	assert.ok(!s.has('greeting'), 'nor one that merely contains s later');
 
 	const le = labelsFor('le');
-	assert.ok(le.has('Left'));
-	assert.ok(!le.has('ScreenRes'), 'typing more narrows the list');
+	assert.ok(le.has('left'));
+	assert.ok(!le.has('screenres'), 'typing more narrows the list');
 
 	// any case typed finds the name, whatever case it is spelled in
 	for (const typed of ['s', 'S', 'sc', 'SC', 'Sc', 'sCrEeN', 'SCREEN']) {
-		assert.ok(labelsFor(typed).has('ScreenRes'), `typing ${typed} should find ScreenRes`);
+		assert.ok(labelsFor(typed).has('screenres'), `typing ${typed} should find screenres`);
 	}
 	for (const typed of ['print', 'PRINT', 'Print', 'pRiNt']) {
 		assert.ok(labelsFor(typed).has('print'), `typing ${typed} should find print`);
 	}
 
 	// with nothing typed, nothing is filtered
-	assert.ok(labelsFor('').has('Abs'));
+	assert.ok(labelsFor('').has('abs'));
 });

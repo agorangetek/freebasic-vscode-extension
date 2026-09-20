@@ -11,9 +11,9 @@ Completion covers the whole language surface, not just keywords:
 
 * **634 built-in names** generated from the official FreeBASIC manual — every
   intrinsic function, statement and keyword, with its real signature, summary
-  and manual category. Language keywords are lower case (`dim`, `print`,
-  `end sub`), following the style fbc's own source is written in; runtime library
-  routines keep the spelling their headers use (`Left`, `ScreenRes`).
+  and manual category. Every one of them is lower case (`dim`, `print`,
+  `end sub`, `left`, `screenres`), the style fbc's own source and headers are
+  written in.
 * **Your own symbols** — procedures, types, enums, constants, `#define`s,
   variables and labels, indexed from the current file and (optionally) from
   every `.bas`/`.bi` file in the workspace.
@@ -36,48 +36,54 @@ Completion covers the whole language surface, not just keywords:
   is documented — there is no page for the combination itself.
 * **Prefix filtering, in any case** — typing a character offers only what
   *starts* with it, whatever case you type. The editor's own filter is fuzzy and
-  also matches inside a name, so `r` would offer `ScreenRes`; the language
+  also matches inside a name, so `r` would offer `screenres`; the language
   service narrows the list itself, and gives each item a `filterText` spelled
   with the case you typed so the editor's second pass cannot drop it either.
 * **Call snippets** — functions with parameters insert a snippet with
-  tab stops, e.g. `Left(str, n)` arrives as `Left(${1:str}, ${2:n})`.
+  tab stops, e.g. `left(str, n)` arrives as `left(${1:str}, ${2:n})`.
 * **Smart casing** — completion matches however you type, but always inserts the
-  canonical spelling: lower case for language keywords, and the runtime
-  library's own spelling for library routines (`ScreenRes`, `GetMouse`, `Left`)
-  rather than the manual's inconsistent `Screenres`/`Getmouse`/`Inkey`.
+  canonical spelling, and the canonical spelling is lower case: `ScreenRes`
+  arrives as `screenres`, `Left` as `left`. Your own names are never re-cased.
 
-Keyword casing follows fbc's own source; the spelling of library routines is
-learned at generation time from ~1,600 programs in the FreeBASIC `examples/`
-tree, so proposals look like the code people really write.
+The rule is one line long: **everything the language provides is lower case, and
+your own identifiers — procedures, types, variables, constants, labels — are
+left exactly as written.**
 
 ### Format Text — canonical casing
 
 FreeBASIC does not care about case, so the extension will fix it for you.
-`FreeBASIC: Format Text (Capitalize Keywords)` is on the editor context menu
+`FreeBASIC: Format Text (Lower-case Keywords)` is on the editor context menu
 (right-click), in the command palette, and as a formatter for
 *Format Document* / *Format Selection*.
 
-It fixes the spelling of the *language* — keywords, datatypes, built-in
-functions and block terminators — and leaves everything else byte for byte:
+It folds the spelling of the *language* — keywords, datatypes, built-in
+functions and statements, block terminators, preprocessor directives and
+intrinsic defines — down to lower case, and leaves everything else byte for
+byte:
 
-* **Your procedures and types get a capital first letter.** `drawBox` becomes
-  `DrawBox` in the declaration and at every call site, and `type vec2` becomes
-  `type Vec2`. Declarations are followed through `#include`, so a procedure
-  declared in a `.bi` is capitalised in the files that call it.
-* **Your variables, constants and labels are never touched** — `i`, `WIDTH` and
-  `myVar` are the author's business. A local `left` also keeps the built-in
-  `Left` out of the file, since the two cannot be told apart.
-* **Comments and string literals are never touched**, so `"screenres"` in a
+* **Everything the language provides is lower case.** `ScreenRes` becomes
+  `screenres`, `Left` becomes `left`, `ByVal` becomes `byval`, `__FB_DARWIN__`
+  becomes `__fb_darwin__`, `#Include` becomes `#include`. The word list is the
+  compiler's own keyword table plus the manual, so words with no manual page of
+  their own (`ptr`, `then`, `wend`, `once`, `protected`) are covered too.
+* **Your own identifiers are never touched** — procedures, types, variables,
+  constants, labels and parameters alike. `drawBox`, `Vec2`, `WIDTH` and `myVar`
+  are the author's business and keep whatever case they were written with, at
+  the declaration and at every use. Declarations are followed through
+  `#include`, so a procedure declared in a `.bi` is recognised as yours in the
+  files that call it. A local `left` also keeps the built-in `left` out of the
+  file, since the two cannot be told apart.
+* **Comments and string literals are never touched**, so `"ScreenRes"` in a
   message or an `Alias` string stays as written.
 * **Line endings are preserved**, and running it twice changes nothing the
   second time.
 
 ```freebasic
-sub main()                          sub Main()
-  dim x as double                     dim x as double
-  ScreenRes 640, 480                  ScreenRes 640, 480
-  print left("dim", 3)                print Left("dim", 3)
-end sub                             end sub
+ScreenRes 640, 480                  screenres 640, 480
+Print Left("dim", 3)                print left("dim", 3)
+Dim MyVar As Double                 dim MyVar as double
+Type Vec2                           type Vec2
+End Sub                             end sub
 ```
 
 ### Hover and signature help
@@ -101,7 +107,7 @@ control flow, teal type names and yellow methods.
 | --- | --- |
 | keywords (`Dim`, `If`, `End`, `As`, `Print`, …) | `keyword.control|operator|other.*.freebasic` |
 | procedure names, declared and called | `entity.name.function.freebasic` |
-| built-in functions (`Left`, `ScreenRes`, …) | `support.function.*.freebasic` |
+| built-in functions (`left`, `screenres`, …) | `support.function.*.freebasic` |
 | type names (`Vec2`) | `entity.name.type.freebasic` |
 | datatypes (`Integer`, `Double`) | `storage.type.*.freebasic` |
 | variables, where declared and where used | `variable.other.freebasic` |
@@ -144,9 +150,9 @@ workspace are completed across modules.
 * **FreeBASIC: Rebuild Symbol Index** (`freebasic.reindex`) — re-scan the workspace.
 * **FreeBASIC: Show Symbol Index Statistics** (`freebasic.showIndexStats`) — how
   many files and symbols were indexed.
-* **FreeBASIC: Format Text (Capitalize Keywords)** (`freebasic.formatText`) — fix
-  identifier casing in the selection, or in the whole file. On the editor
-  context menu, and registered as the formatter for the language.
+* **FreeBASIC: Format Text (Lower-case Keywords)** (`freebasic.formatText`) — fold
+  the language's names to lower case in the selection, or in the whole file. On
+  the editor context menu, and registered as the formatter for the language.
 
 ## Building from source
 
@@ -157,21 +163,26 @@ npm run package   # produces freebasic-<version>.vsix
 ```
 
 The completion database is generated from the FreeBASIC manual and is committed
-to `src/data/`. The generator also cross-checks its result against the compiler's
-own keyword table (`src/compiler/symb-keyword.bas`) and reports any keyword the
-manual data does not cover, which is how `ImageCreate` and the `AndAlso`/`OrElse`
-operators were found missing. To refresh it against a newer manual checkout:
+to `src/data/`. The generator also reads the compiler's own keyword table
+(`src/compiler/symb-keyword.bas`): its keywords travel with the data, so words
+the manual gives no page of their own (`ptr`, `then`, `wend`, `once`) are still
+folded by Format Text, and the generator reports any keyword the manual data
+does not cover — which is how `ImageCreate` and the `AndAlso`/`OrElse` operators
+were found missing. To refresh it against a newer manual checkout:
 
 ```sh
 node tools/gen-data.mjs /path/to/fbc
 ```
 
-That reads `doc/manual/cache/KeyPg*.wakka` plus `examples/**/*.bas` from the
-FreeBASIC source tree and rewrites `src/data/fb-builtins.json` /
-`fb-builtins.ts`.
+That reads `doc/manual/cache/KeyPg*.wakka` plus `src/compiler/symb-keyword.bas`
+from the FreeBASIC source tree and rewrites `src/data/fb-builtins.json` /
+`fb-builtins.ts`. Every name it writes is already lower case.
 
 The language service lives in `src/service/` and deliberately does not import
-`vscode`, so it can be unit-tested directly with `node --test` on Node 18+.
+`vscode`, so it can be unit-tested directly with `node --test` against the `.ts`
+sources. `npm test` passes `--experimental-strip-types`, so it works on Node 22.6
+and newer (23.6+ strips types by default and accepts the flag harmlessly). The
+bundled extension itself still runs on the Node inside VS Code.
 
 ## Requirements
 

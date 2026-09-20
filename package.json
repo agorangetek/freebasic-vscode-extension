@@ -2,7 +2,7 @@
 	"name": "freebasic",
 	"displayName": "FreeBASIC",
 	"description": "FreeBASIC language support for Visual Studio Code: code completion, hover, signature help and document outline.",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"publisher": "sorucoder",
 	"license": "MIT",
 	"engines": {
@@ -104,7 +104,7 @@
 			},
 			{
 				"command": "freebasic.formatText",
-				"title": "FreeBASIC: Format Text (Capitalize Keywords)",
+				"title": "FreeBASIC: Format Text (Lower-case Keywords)",
 				"category": "FreeBASIC"
 			}
 		],
@@ -129,7 +129,7 @@
 		"build": "node esbuild.mjs",
 		"watch": "node esbuild.mjs --watch",
 		"typecheck": "tsc --noEmit",
-		"test": "node --test test/*.test.ts",
+		"test": "node --experimental-strip-types --test test/*.test.ts",
 		"check": "npm run typecheck && npm run test && npm run build",
 		"vscode:prepublish": "npm run build",
 		"package": "vsce package"

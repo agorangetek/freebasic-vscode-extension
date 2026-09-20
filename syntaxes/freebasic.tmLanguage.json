@@ -567,7 +567,7 @@
 		},
 		"variable-declarations": {
 			"name": "meta.declaration.variable.freebasic",
-			"begin": "(?i)\\b(common|const|dim|extern|redim|static|var)\\b",
+			"begin": "(?i)\\b(common|const|dim|extern|redim|var|static(?![ \\t]+(?:constructor|destructor|operator|property|function|sub)\\b))\\b",
 			"beginCaptures": {
 				"1": { "name": "keyword.other.declaration.variable.freebasic" }
 			},
@@ -674,13 +674,14 @@
 			]
 		},
 		"procedure-body-declarations": {
-			"begin": "(?i)(?:(private|public)[ \t]+)?\\b(constructor|destructor|operator|property|function|sub)\\b(?:[ \t]+([a-z_][a-z0-9_]*))?",
+			"begin": "(?i)(?:(private|public)[ \t]+)?(?:(static)[ \t]+)?\\b(constructor|destructor|operator|property|function|sub)\\b(?:[ \t]+([a-z_][a-z0-9_]*))?",
 			"beginCaptures": {
 				"1": { "name": "storage.modifier.procedure.freebasic" },
-				"2": { "name": "keyword.other.declaration.procedure.body.begin.freebasic" },
-				"3": { "name": "entity.name.function.freebasic" }
+				"2": { "name": "storage.modifier.procedure.freebasic" },
+				"3": { "name": "keyword.other.declaration.procedure.body.begin.freebasic" },
+				"4": { "name": "entity.name.function.freebasic" }
 			},
-			"end": "(?i)\\b(end[ \t]+\\2)\\b",
+			"end": "(?i)\\b(end[ \t]+\\3)\\b",
 			"endCaptures": {
 				"1": { "name": "keyword.other.declaration.procedure.body.end.freebasic" }
 			},
@@ -1235,8 +1236,20 @@
 			"match": "(?i)\\bstop\\b"
 		},
 		"control-flow-end": {
-			"name": "keyword.control.end",
-			"match": "(?i)\\bend\\b"
+			"comment": "The 'end' statement and the terminators it introduces. A terminator is matched whole, here as well as inside its block, so it is always one token -- but each keeps the scope its own construct uses, so 'end sub' is coloured like 'sub' and 'end if' like 'if'. Without this, a terminator with no block open (a prototype, or a 'static sub' the body rule has not claimed) split into 'end' plus a begin/field word.",
+			"patterns": [
+				{ "name": "keyword.other.declaration.procedure.body.end.freebasic", "match": "(?i)\\bend[ \\t]+(?:constructor|destructor|function|operator|property|sub)\\b" },
+				{ "name": "keyword.other.declaration.type.end.freebasic", "match": "(?i)\\bend[ \\t]+type\\b" },
+				{ "name": "keyword.other.declaration.union.end.freebasic", "match": "(?i)\\bend[ \\t]+union\\b" },
+				{ "name": "keyword.other.declaration.enumeration.end.freebasic", "match": "(?i)\\bend[ \\t]+enum\\b" },
+				{ "name": "keyword.other.declaration.instance.end.freebasic", "match": "(?i)\\bend[ \\t]+with\\b" },
+				{ "name": "keyword.control.if.end.freebasic", "match": "(?i)\\bend[ \\t]*if\\b" },
+				{ "name": "keyword.control.select.end.freebasic", "match": "(?i)\\bend[ \\t]+select\\b" },
+				{ "name": "keyword.control.namespace.end.freebasic", "match": "(?i)\\bend[ \\t]+namespace\\b" },
+				{ "name": "keyword.control.scope.end.freebasic", "match": "(?i)\\bend[ \\t]+scope\\b" },
+				{ "name": "keyword.control.extern.end.freebasic", "match": "(?i)\\bend[ \\t]+extern\\b" },
+				{ "name": "keyword.control.end.freebasic", "match": "(?i)\\bend\\b(?![ \\t]*(?:constructor|destructor|enum|extern|function|if|namespace|operator|property|scope|select|sub|type|union|with)\\b)" }
+			]
 		},
 
 		"scoping": {

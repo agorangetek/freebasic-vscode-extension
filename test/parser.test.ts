@@ -83,6 +83,64 @@ test('parseDocument finds procedures, locals, types, consts and includes', () =>
 	assert.ok(!byName.has('blocked'), 'block comment must not define a symbol');
 });
 
+test('one statement may declare several names, with the type first or last', () => {
+	const doc = parseDocument(
+		'file:///t.bas',
+		[
+			'dim a, b as integer',
+			'const X = 1, Y = 2',
+			'dim shared as integer counter',
+			'dim as string label',
+			'dim as Vec2 origin, other',
+			'dim grid(4, 4) as double',
+			'dim point as Vec2 = (1.0, 0.0)',
+		].join('\n'),
+	);
+	assert.deepEqual(
+		doc.symbols.map((s) => `${s.name}[${s.kind}]`),
+		[
+			'a[variable]',
+			'b[variable]',
+			'X[const]',
+			'Y[const]',
+			'counter[variable]',
+			'label[variable]',
+			'origin[variable]',
+			'other[variable]',
+			'grid[variable]',
+			'point[variable]',
+		],
+	);
+	// `dim as integer x` used to be recorded as a variable called "as"
+	assert.ok(!doc.symbols.some((s) => s.name.toLowerCase() === 'as'));
+});
+
+test('a procedure records the line its body ends on', () => {
+	const doc = parseDocument('file:///t.bas', SAMPLE);
+	assert.equal(doc.symbols.find((s) => s.name === 'mySub')?.endLine, 4);
+	assert.equal(doc.symbols.find((s) => s.name === 'add')?.endLine, 8);
+
+	// a prototype has no body, so it has no closing line
+	const prototype = parseDocument('file:///t.bas', 'declare function ext() as integer');
+	assert.equal(prototype.symbols[0]?.endLine, undefined);
+});
+
+test('var declares a name too, inferring its type from the initializer', () => {
+	const doc = parseDocument(
+		'file:///t.bas',
+		[
+			'var n = 5',
+			'var ratio = 1.5, label = "hi"',
+			'var shared global = 0',
+			'var total = sum(1, 2)',
+		].join('\n'),
+	);
+	assert.deepEqual(
+		doc.symbols.map((s) => `${s.name}[${s.kind}]`),
+		['n[variable]', 'ratio[variable]', 'label[variable]', 'global[variable]', 'total[variable]'],
+	);
+});
+
 test('parameterNames extracts names from a parameter list', () => {
 	assert.deepEqual(parameterNames('byval a as integer, byref s as string'), ['a', 's']);
 	assert.deepEqual(parameterNames('x as integer'), ['x']);

@@ -4,85 +4,79 @@
  * FreeBASIC is case-insensitive, so rewriting an identifier's case can never
  * change what a program means -- but it makes code read consistently.
  *
- * Three sources decide a spelling:
- *   - the manual's built-ins and the block keywords;
- *   - the author's procedures and types, whose first letter is capitalised
- *     (`drawBox` and every use of it become `DrawBox`) -- the convention the
- *     language's own examples and C#-style FreeBASIC both follow;
- *   - the author's variables, constants and labels, which are left exactly as
- *     written: `i`, `WIDTH` and `myVar` are the author's business.
+ * The rule is one line long: everything the language provides is lower case,
+ * and nothing else is touched.
+ *
+ *   - keywords, statements, built-in functions, datatypes, operators and
+ *     preprocessor directives are folded down: `ScreenRes` -> `screenres`,
+ *     `Left` -> `left`, `__FB_DARWIN__` -> `__fb_darwin__`;
+ *   - the user's own identifiers are the user's business and are left exactly
+ *     as written: procedures, types, variables, constants and labels alike
+ *     (`drawBox`, `Vec2`, `WIDTH`, `MyLocal` are never rewritten).
  *
  * Comments and string literals are left alone too: the spelling of a word
  * inside a message or an Alias string is part of the text, not of the code.
  */
 import { FB_BUILTINS } from '../data/fb-builtins.ts';
-import { maskSource } from './parser.ts';
+import { maskSource, parameterNames } from './parser.ts';
 import type { FbSymbol } from './types.ts';
 
-export interface CapitalizeResult {
+export interface CasingResult {
 	/** The rewritten text. */
 	text: string;
 	/** How many identifiers were changed. */
 	changes: number;
 }
 
-const IDENTIFIER = /[A-Za-z_][A-Za-z0-9_]*/g;
+/**
+ * An identifier, or a preprocessor directive with its `#` (`#include`). The
+ * `#` has to be part of the match: `include` on its own is an ordinary name a
+ * user may well have declared, while `#include` is the language's.
+ */
+const IDENTIFIER = /#?[A-Za-z_][A-Za-z0-9_]*/g;
 
-/** Procedures and types read as names, so their first letter is capitalised. */
-const CAPITALISED_KINDS =
-	/^(?:sub|function|constructor|destructor|property|operator|type|union|enum|class|namespace)$/;
-
-/** `drawBox` -> `DrawBox`; anything already capitalised is unchanged. */
-export function capitalizeFirst(name: string): string {
-	return name.length > 0 ? name[0]!.toUpperCase() + name.slice(1) : name;
-}
-
-/** Lower-cased name -> canonical spelling, built once. */
-const BUILTIN_NAMES: ReadonlyMap<string, string> = (() => {
-	const map = new Map<string, string>();
-	const add = (name: string) => {
-		const key = name.toLowerCase();
-		if (name.length > 0 && !map.has(key)) map.set(key, name);
-	};
-	for (const item of FB_BUILTINS.items) add(item.name);
+/** Every name the language provides, lower-cased, built once. */
+const LANGUAGE_NAMES: ReadonlySet<string> = (() => {
+	const names = new Set<string>();
+	for (const item of FB_BUILTINS.items) names.add(item.name.toLowerCase());
+	// the compiler's keyword table also covers the words with no manual page of
+	// their own (`ptr`, `then`, `wend`, `once`, `protected`, ...)
+	for (const keyword of FB_BUILTINS.keywords) names.add(keyword.toLowerCase());
 	// "Select Case", "End Function" and friends: each word on its own, since an
 	// identifier is what gets rewritten
 	for (const block of FB_BUILTINS.blocks) {
-		for (const word of `${block.opener} ${block.closer}`.split(/\s+/)) add(word);
+		for (const word of `${block.opener} ${block.closer}`.split(/\s+/)) {
+			if (word.length > 0) names.add(word.toLowerCase());
+		}
 	}
-	return map;
+	return names;
 })();
 
 /**
- * Rewrite every identifier that has a known canonical spelling.
+ * Fold every name the language provides down to lower case, and leave the
+ * user's own identifiers -- procedures, types, variables, constants and
+ * labels -- exactly as written.
  *
- * `declaredSymbols` (from parseDocument) is what keeps a procedure called
- * `name` from being rewritten to the manual's `Name` statement, and a local
- * `left` from becoming `Left`.
+ * `declaredSymbols` (from parseDocument) is what keeps a local variable called
+ * `left`, or a procedure called `name`, out of the rewrite: a name the user
+ * declared is theirs, even when the language has a built-in of the same name.
  */
-export function capitalizeIdentifiers(
+export function lowercaseLanguageNames(
 	text: string,
 	declaredSymbols: readonly FbSymbol[] = [],
-): CapitalizeResult {
-	/** Every declared name, so no built-in rule can claim one. */
+): CasingResult {
+	/** Every name the user declared, lower-cased, so no built-in rule claims one. */
 	const declared = new Set<string>();
-	/** Procedures and types, lower-cased -> capitalised spelling. */
-	const capitalised = new Map<string, string>();
-	for (const symbol of declaredSymbols) {
-		const key = symbol.name.toLowerCase();
-		if (key.length === 0) continue;
-		declared.add(key);
-		if (CAPITALISED_KINDS.test(symbol.kind) && !capitalised.has(key)) {
-			capitalised.set(key, capitalizeFirst(symbol.name));
-		}
-	}
-
-	const lookup = (lower: string): string | undefined => {
-		const own = capitalised.get(lower);
-		if (own) return own;
-		if (declared.has(lower)) return undefined;
-		return BUILTIN_NAMES.get(lower);
+	const add = (name: string) => {
+		const key = name.toLowerCase();
+		if (key.length > 0) declared.add(key);
 	};
+	for (const symbol of declaredSymbols) {
+		add(symbol.name);
+		// a procedure's parameters are the user's names too, even though the
+		// parser records them on the procedure rather than as symbols
+		for (const parameter of parameterNames(symbol.params)) add(parameter);
+	}
 
 	const maskedLines = maskSource(text);
 	// keep the original line separators (\r\n, \r or \n) exactly as they were
@@ -101,10 +95,12 @@ export function capitalizeIdentifiers(
 			// character means this identifier is not code
 			if (masked[start] !== source[start]) continue;
 
-			const replacement = lookup(match[0].toLowerCase());
-			if (!replacement || replacement === match[0]) continue;
+			const lower = match[0].toLowerCase();
+			if (declared.has(lower)) continue;
+			if (!LANGUAGE_NAMES.has(lower)) continue;
+			if (lower === match[0]) continue;
 
-			out += source.slice(last, start) + replacement;
+			out += source.slice(last, start) + lower;
 			last = start + match[0].length;
 			changes++;
 		}

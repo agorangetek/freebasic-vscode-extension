@@ -232,56 +232,17 @@ for (const f of files.sort()) {
 }
 
 /*
- * The manual spells some keywords in a way nobody writes in real code
- * ("Screenres", "Screenlock").  The compiler's own 1500+ example programs are
- * real, conventionally-cased FreeBASIC, so learn the preferred spelling of
- * each name from them: prefer a mixed-case variant (ScreenRes, MultiKey) over
- * an all-caps or all-lower one, then the most frequent.
+ * Every name the language provides is written in lower case: keywords,
+ * library routines, intrinsic defines and preprocessor directives alike. The
+ * manual and its example programs spell things inconsistently ("Screenres" vs
+ * "ScreenRes", "Left" vs "left"), so the spelling is not learned from them --
+ * it is folded down here, once, at generation time.
+ *
+ * That is the whole of the casing policy. The user's own identifiers --
+ * variables, procedures, types, constants, labels -- are the user's business,
+ * and are neither spelled here nor rewritten by the formatter that reads this
+ * data.
  */
-function preferredCasing(names, examplesDir) {
-	const wanted = new Set(names.map((n) => n.toLowerCase()));
-	const counts = new Map();
-
-	let files;
-	try {
-		files = readdirSync(examplesDir, { recursive: true }).filter((f) =>
-			typeof f === 'string' && /\.(bas|bi)$/i.test(f),
-		);
-	} catch {
-		return new Map();
-	}
-
-	for (const rel of files) {
-		let text;
-		try {
-			text = readFileSync(join(examplesDir, rel), 'utf8');
-		} catch {
-			continue;
-		}
-		for (const m of text.matchAll(/[A-Za-z_][A-Za-z0-9_]*/g)) {
-			const word = m[0];
-			const lower = word.toLowerCase();
-			if (!wanted.has(lower)) continue;
-			let variants = counts.get(lower);
-			if (!variants) {
-				variants = new Map();
-				counts.set(lower, variants);
-			}
-			variants.set(word, (variants.get(word) ?? 0) + 1);
-		}
-	}
-
-	const best = new Map();
-	for (const [lower, variants] of counts) {
-		const entries = [...variants.entries()];
-		const mixed = entries.filter(([w]) => /[A-Z]/.test(w) && /[a-z]/.test(w));
-		const pool = mixed.length > 0 ? mixed : entries.filter(([w]) => /[a-z]/.test(w));
-		if (pool.length === 0) continue;
-		pool.sort((a, b) => b[1] - a[1] || a[0].length - b[0].length);
-		best.set(lower, pool[0][0]);
-	}
-	return best;
-}
 
 /** The name right after the procedure keyword in a declaration line. */
 const DECL_NAME_RE =
@@ -299,45 +260,7 @@ function unescapeWakka(text) {
 	return text.replace(/""/g, '"');
 }
 
-/*
- * fbc's own source is written with lower-case keywords, and that is the style
- * this data follows: every language keyword is lower case. The runtime library
- * keeps the spelling its own headers use -- `ScreenRes`, `Left` -- so only
- * items that are language, rather than library, are folded down.
- *
- * Language is: every keyword page, plus the statements that happen to be
- * documented with a "declare sub". The intrinsic defines stay upper case,
- * since that is how they are invariably written.
- */
-const LANGUAGE_STATEMENTS = new Set([
-	'beep',
-	'clear',
-	'cls',
-	'end',
-	'erase',
-	'error',
-	'lset',
-	'mid',
-	'poke',
-	'randomize',
-	'reset',
-	'rset',
-	'stop',
-	'swap',
-	'system',
-]);
-
-const preferred = preferredCasing(
-	items.map((i) => i.name),
-	join(fbcRoot, 'examples'),
-);
-let renamed = 0;
 for (const item of items) {
-	const better = preferred.get(item.name.toLowerCase());
-	if (better && better !== item.name) {
-		item.name = better;
-		renamed++;
-	}
 	// Where a page has no identifier in its syntax, its title is used as the
 	// name -- and titles disambiguate themselves, as in "ALIAS (Name)" or
 	// "Operator + (Addition)".  The qualifier belongs to the title, not the
@@ -349,14 +272,21 @@ for (const item of items) {
 	}
 	if (bare.length > 0) item.name = bare;
 
-	const isLanguage =
-		item.kind === 'keyword' || LANGUAGE_STATEMENTS.has(item.name.toLowerCase());
-	if (isLanguage && !item.name.startsWith('__')) item.name = item.name.toLowerCase();
+	// everything the language provides, lower case -- keywords, library
+	// routines, intrinsic defines and preprocessor directives alike
+	item.name = item.name.toLowerCase();
 
 	// declarations, call labels and prose all carried the manual's spelling
 	for (const sig of item.signatures) {
-		sig.text = renameInDeclaration(sig.text, item.name);
-		sig.label = callLabel(item.name, sig.params);
+		sig.text = renameInDeclaration(sig.text, item.name).toLowerCase();
+		sig.label = callLabel(item.name, sig.params).toLowerCase();
+		// the parameter list is shown on its own -- signature help documents the
+		// active parameter as "byval any ptr" -- so fold it too
+		for (const param of sig.params) {
+			if (param.mode) param.mode = param.mode.toLowerCase();
+			if (param.type) param.type = param.type.toLowerCase();
+			if (param.name) param.name = param.name.toLowerCase();
+		}
 	}
 	item.summary = unescapeWakka(item.summary);
 	item.usage = item.usage.map(unescapeWakka);
@@ -409,8 +339,6 @@ for (const [page, fallback] of [
 	addBlock(item?.name ?? fallback, terminatorOf(item) ?? fallback, page);
 }
 for (const block of blocks) {
-	const better = preferred.get(block.opener.toLowerCase());
-	if (better) block.opener = better;
 	// block openers and terminators are language keywords like any other
 	block.opener = block.opener.toLowerCase();
 	block.closer = block.closer.toLowerCase();
@@ -433,11 +361,46 @@ const version = (() => {
 	}
 })();
 
+/*
+ * The compiler's lexer is the authority on what the language accepts, the
+ * manual on what it means. Its keyword table also names a few words the manual
+ * gives no page of its own -- `ptr`, `then`, `wend`, `protected` -- so the list
+ * travels with the data: the formatter folds those down too, and the comparison
+ * below is how "ImageCreate" and the "AndAlso"/"OrElse" operators were found
+ * missing from the manual.
+ */
+let compilerKeywords = [];
+try {
+	const table = readFileSync(join(fbcRoot, 'src', 'compiler', 'symb-keyword.bas'), 'utf8');
+	compilerKeywords = [
+		...new Set(
+			[...table.matchAll(/\(\s*@"([^"]+)"\s*,\s*(FB_TK_\w+)\s*,\s*(FB_TKCLASS_\w+)/g)].map((m) =>
+				m[1].toLowerCase(),
+			),
+		),
+	].sort();
+} catch {
+	// no compiler checkout alongside: the manual data stands on its own
+}
+
+/*
+ * A few language words the compiler handles outside its keyword table: `once`
+ * (as in `#include once`) and the passing / calling conventions that are also
+ * written without the leading underscores (`bydesc`, `fastcall`, `thiscall`).
+ * They are language words all the same, so they travel with the keywords.
+ */
+for (const extra of ['bydesc', 'fastcall', 'once', 'thiscall']) {
+	if (!compilerKeywords.includes(extra)) compilerKeywords.push(extra);
+}
+compilerKeywords.sort();
+
 const out = {
 	source: `FreeBASIC ${version} manual`,
 	generatedFrom: cacheDir,
 	count: items.length,
 	blocks,
+	/** Every keyword fbc's lexer accepts, lower case. */
+	keywords: compilerKeywords,
 	items,
 };
 
@@ -479,19 +442,11 @@ console.log(
 		.sort((a, b) => b[1] - a[1])
 		.slice(0, 6),
 );
-// The compiler's lexer is the authority on what the language accepts, the
-// manual on what it means. Comparing the two is how "ImageCreate" and the
-// "AndAlso"/"OrElse" operators were found missing from this data.
-try {
-	const table = readFileSync(join(fbcRoot, 'src', 'compiler', 'symb-keyword.bas'), 'utf8');
-	const rows = [...table.matchAll(/\(\s*@"([^"]+)"\s*,\s*(FB_TK_\w+)\s*,\s*(FB_TKCLASS_\w+)/g)];
-	const covered = new Set(items.map((i) => i.name.toLowerCase()));
-	const absent = rows.map((m) => m[1]).filter((n) => !covered.has(n.toLowerCase()));
-	console.log(`  compiler: ${rows.length} keywords, ${absent.length} with no page in this data`);
-	if (absent.length > 0) console.log('    no manual page:', absent.join(', '));
-} catch {
-	// no compiler checkout alongside: nothing to compare against
-}
+// which of the compiler's keywords the manual data has no page for
+const covered = new Set(items.map((i) => i.name.toLowerCase()));
+const absent = compilerKeywords.filter((n) => !covered.has(n));
+console.log(`  compiler: ${compilerKeywords.length} keywords, ${absent.length} with no page in this data`);
+if (absent.length > 0) console.log('    no manual page:', absent.join(', '));
 
 for (const want of ['left', 'abs', 'screenres', 'dim', 'open', 'operator']) {
 	const found = items.filter((i) => i.name.toLowerCase() === want);

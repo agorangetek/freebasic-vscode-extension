@@ -34,6 +34,12 @@ export interface FbSymbol {
 	kind: FbSymbolKind;
 	/** Zero-based line of the declaration. */
 	line: number;
+	/**
+	 * Procedures: zero-based line of the `end sub` / `end function` that closes
+	 * the body, when one has been seen. Absent while the body is still open
+	 * (a half-typed procedure), where it should be treated as extending on.
+	 */
+	endLine?: number;
 	/** The declaration line, trimmed, for display. */
 	detail: string;
 	/** Enclosing procedure for locals, or '' at module level. */
@@ -103,6 +109,13 @@ export interface FbBuiltinData {
 	/** Absolute path of the manual checkout this data was generated from. */
 	generatedFrom?: string;
 	count: number;
+	/**
+	 * Every keyword fbc's lexer accepts, lower case (from the compiler's own
+	 * `symb-keyword.bas`). It names a few words the manual gives no page of its
+	 * own -- `ptr`, `then`, `wend`, `once`, `protected` -- which the formatter
+	 * still has to fold down.
+	 */
+	keywords: string[];
 	/** Block constructs, from the manual's KeyPgEndblock terminator list. */
 	blocks: FbBlock[];
 	items: FbBuiltin[];

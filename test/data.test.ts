@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { FB_BUILTINS } from '../src/data/fb-builtins.ts';
 import { blockBody, blockContinuations } from '../src/service/blocks.ts';
 import {
 	allBlocks,
@@ -50,8 +51,8 @@ test('lookup is case-insensitive and carries signatures', () => {
 	assert.ok(left, 'LEFT not found');
 	assert.equal(left.kind, 'function');
 	assert.equal(left.category, 'String Functions');
-	assert.equal(left.name, 'Left');
-	assert.equal(left.signatures[0].label, 'Left(str, n)');
+	assert.equal(left.name, 'left');
+	assert.equal(left.signatures[0].label, 'left(str, n)');
 	assert.deepEqual(
 		left.signatures[0].params.map((p) => p.name),
 		['str', 'n'],
@@ -59,17 +60,50 @@ test('lookup is case-insensitive and carries signatures', () => {
 
 	const markdown = builtinMarkdown(left);
 	assert.match(markdown, /leftmost substring/);
-	assert.match(markdown, /^```freebasic\nfunction Left \(/);
+	assert.match(markdown, /^```freebasic\nfunction left \(/);
 	assert.match(markdown, /freebasic\.net\/wiki/);
 });
 
-test('generated data carries the preferred casing from example code', () => {
-	// the manual writes "Screenres", "Screenlock" and "Getmouse"; real code does not
-	for (const name of ['ScreenRes', 'ScreenLock', 'ScreenUnlock', 'ScreenCopy', 'GetMouse', 'MultiKey']) {
+test('every name the language provides is lower case', () => {
+	// the manual and its examples spell things inconsistently ("Screenres" vs
+	// "ScreenRes", "Left" vs "left"); the data is folded down once, so
+	// completion, the block scaffolds and the formatter all agree
+	for (const item of allBuiltins()) {
+		assert.equal(item.name, item.name.toLowerCase(), `${item.name} is not lower case`);
+		for (const signature of item.signatures) {
+			assert.equal(signature.text, signature.text.toLowerCase(), signature.text);
+			assert.equal(signature.label, signature.label.toLowerCase(), signature.label);
+			// signature help documents the active parameter from these fields
+			for (const parameter of signature.params) {
+				for (const [field, value] of Object.entries(parameter)) {
+					if (value) {
+						assert.equal(value, value.toLowerCase(), `${item.name}: ${field}=${value}`);
+					}
+				}
+			}
+		}
+	}
+	for (const name of ['screenres', 'screenlock', 'screenunlock', 'screencopy', 'getmouse', 'multikey']) {
 		const item = lookupBuiltin(name);
 		assert.ok(item, `${name} not found`);
 		assert.equal(item.name, name);
 		assert.match(item.signatures[0]?.text ?? '', new RegExp(`function ${name} |sub ${name} `));
+	}
+	// the intrinsic defines are language too, underscores and all
+	assert.equal(lookupBuiltin('__FB_DARWIN__')?.name, '__fb_darwin__');
+});
+
+test('the compiler keyword table travels with the data', () => {
+	// a few words have no manual page of their own, so they would otherwise be
+	// missed by the formatter: ptr, then, wend, once, protected, ...
+	for (const keyword of ['ptr', 'then', 'wend', 'once', 'protected', 'bydesc', 'select', 'include']) {
+		assert.ok(
+			FB_BUILTINS.keywords.includes(keyword),
+			`${keyword} is missing from the compiler keyword list`,
+		);
+	}
+	for (const keyword of FB_BUILTINS.keywords) {
+		assert.equal(keyword, keyword.toLowerCase(), `${keyword} is not lower case`);
 	}
 });
 
@@ -183,7 +217,7 @@ test('names come from the page, not from a parameter default', () => {
 	assert.ok(imageCreate, 'ImageCreate is missing');
 	assert.equal(imageCreate.kind, 'function');
 	assert.ok(imageCreate.summary.length > 0);
-	assert.match(imageCreate.signatures[0]?.label ?? '', /^ImageCreate\(/);
+	assert.match(imageCreate.signatures[0]?.label ?? '', /^imagecreate\(/);
 	assert.ok(
 		!allBuiltins().some((i) => i.name === 'transparent_color'),
 		'a parameter default must not become an item',
@@ -214,9 +248,9 @@ test('a page mentioning "declare function" is not always a function', () => {
 	}
 });
 
-test('the manual spelling is kept when the examples do not use the name', () => {
-	// the calling conventions are written __Fastcall / __Thiscall in the manual
-	// and never appear in the examples, so nothing should rename them
-	assert.equal(lookupBuiltin('__Fastcall')?.name, '__Fastcall');
-	assert.equal(lookupBuiltin('__Thiscall')?.name, '__Thiscall');
+test('calling conventions keep their underscores, in lower case', () => {
+	// the manual writes __Fastcall / __Thiscall; the underscores are part of the
+	// name, the case is not
+	assert.equal(lookupBuiltin('__Fastcall')?.name, '__fastcall');
+	assert.equal(lookupBuiltin('__Thiscall')?.name, '__thiscall');
 });

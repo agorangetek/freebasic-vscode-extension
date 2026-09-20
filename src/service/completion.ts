@@ -154,6 +154,10 @@ export function enclosingProcedure(document: FbDocument, position: FbPosition): 
 	for (const symbol of document.symbols) {
 		if (!/^(sub|function|constructor|destructor|property|operator)$/.test(symbol.kind)) continue;
 		if (symbol.line > position.line) continue;
+		// a procedure that has already been closed above the cursor does not
+		// enclose it: otherwise every position after the last `end sub` would
+		// still see that procedure's locals
+		if (symbol.endLine !== undefined && symbol.endLine < position.line) continue;
 		if (!best || symbol.line > best.line) best = symbol;
 	}
 	return best;

@@ -6,7 +6,7 @@
  */
 import * as vscode from 'vscode';
 import { builtinCount, builtinSource } from './service/builtins.ts';
-import { capitalizeIdentifiers } from './service/casing.ts';
+import { lowercaseLanguageNames } from './service/casing.ts';
 import { parseDocument } from './service/parser.ts';
 import { buildCompletions } from './service/completion.ts';
 import { getHover } from './service/hover.ts';
@@ -203,7 +203,7 @@ export function activate(context: vscode.ExtensionContext): void {
 		}),
 	);
 
-	/* ------------------------------------------------ format / capitalize */
+	/* ------------------------------------------------ format / lower-case */
 
 	/**
 	 * Every symbol visible in `document`: its own, plus those of the files it
@@ -249,13 +249,13 @@ export function activate(context: vscode.ExtensionContext): void {
 		return symbols;
 	}
 
-	/** Rewrite canonical spellings inside `range`, as a single replacement. */
-	async function capitalizationEdits(
+	/** Fold language names to lower case inside `range`, as a single replacement. */
+	async function lowercasingEdits(
 		document: vscode.TextDocument,
 		range: vscode.Range,
 	): Promise<{ edit: vscode.TextEdit; changes: number } | undefined> {
 		const source = document.getText(range);
-		const result = capitalizeIdentifiers(source, await translationUnitSymbols(document));
+		const result = lowercaseLanguageNames(source, await translationUnitSymbols(document));
 		if (result.changes === 0) return undefined;
 		return { edit: vscode.TextEdit.replace(range, result.text), changes: result.changes };
 	}
@@ -273,14 +273,14 @@ export function activate(context: vscode.ExtensionContext): void {
 					editor.document.positionAt(editor.document.getText().length),
 				);
 
-			const result = await capitalizationEdits(editor.document, range);
+			const result = await lowercasingEdits(editor.document, range);
 			if (!result) {
-				void vscode.window.showInformationMessage('FreeBASIC: nothing to capitalize.');
+				void vscode.window.showInformationMessage('FreeBASIC: nothing to lower-case.');
 				return;
 			}
 			await editor.edit((builder) => builder.replace(result.edit.range, result.edit.newText));
 			void vscode.window.setStatusBarMessage(
-				`FreeBASIC: capitalized ${result.changes} identifiers.`,
+				`FreeBASIC: lower-cased ${result.changes} identifiers.`,
 				4000,
 			);
 		}),
@@ -290,7 +290,7 @@ export function activate(context: vscode.ExtensionContext): void {
 	const formattingProvider: vscode.DocumentFormattingEditProvider &
 		vscode.DocumentRangeFormattingEditProvider = {
 		async provideDocumentFormattingEdits(document) {
-			const result = await capitalizationEdits(
+			const result = await lowercasingEdits(
 				document,
 				new vscode.Range(
 					document.positionAt(0),
@@ -300,7 +300,7 @@ export function activate(context: vscode.ExtensionContext): void {
 			return result ? [result.edit] : [];
 		},
 		async provideDocumentRangeFormattingEdits(document, range) {
-			const result = await capitalizationEdits(document, range);
+			const result = await lowercasingEdits(document, range);
 			return result ? [result.edit] : [];
 		},
 	};

@@ -430,3 +430,144 @@ test('word and symbol operators keep the operator scope', { skip }, async () => 
 		}
 	}
 });
+
+/* ------------------------------------------------------ block terminators */
+
+/**
+ * Every block opener, the keyword that opens it, and the terminator that closes
+ * it. A closer is coloured like its opener: `end sub` like `sub`, `end if` like
+ * `if`.
+ */
+const TERMINATORS: readonly [string, string, string][] = [
+	['sub foo()', 'sub', 'end sub'],
+	['static sub foo()', 'sub', 'end sub'],
+	['private sub foo()', 'sub', 'End Sub'],
+	['function foo() as integer', 'function', 'end function'],
+	['static function foo() as integer', 'function', 'End Function'],
+	['constructor t()', 'constructor', 'end constructor'],
+	['destructor t()', 'destructor', 'end destructor'],
+	['property p() as integer', 'property', 'end property'],
+	['operator +(a as T) as T', 'operator', 'end operator'],
+	['type T', 'type', 'end type'],
+	['union U', 'union', 'end union'],
+	['enum E', 'enum', 'end enum'],
+	['namespace n', 'namespace', 'end namespace'],
+	['scope', 'scope', 'end scope'],
+	['with v', 'with', 'end with'],
+	['if x then', 'if', 'end if'],
+	['select case x', 'select', 'end select'],
+	['for i as integer = 1 to 2', 'for', 'next'],
+	['do', 'do', 'loop'],
+	['while x', 'while', 'wend'],
+];
+
+/** The last line's tokens, ignoring the whitespace between them. */
+function codeTokens(lines: Token[][]): Token[] {
+	return lines[lines.length - 1]!.filter((t) => t.text.trim() !== '');
+}
+
+/** The colour family of a token: 'keyword.control', 'keyword.other', ... */
+function family(token: Token): string {
+	const scope = token.scopes.find((s) => /^(?:keyword|storage|entity|support|variable|constant)\./.test(s));
+	assert.ok(scope, `no colour scope on ${JSON.stringify(token.text)}: ${token.scopes.join(' ')}`);
+	return scope.split('.').slice(0, 2).join('.');
+}
+
+/** The token on the opener line that spells `keyword`. */
+function openerToken(lines: Token[][], keyword: string): Token {
+	const token = lines[0]!.find((t) => t.text.trim().toLowerCase().startsWith(keyword));
+	assert.ok(token, `"${keyword}" not found in ${JSON.stringify(lines[0]!.map((t) => t.text))}`);
+	return token;
+}
+
+/*
+ * "end sub" is one terminator, so it must be one token: when the grammar split
+ * it, "end" was keyword.control (pink) and "sub" was keyword.other (blue), and
+ * the closing line no longer matched its opening one. That is what happened
+ * whenever no procedure body was open -- "static sub foo()" was swallowed by
+ * the variable rule, so its "end sub" had no block to close. Which colour a
+ * terminator keeps is its opener's, and that is why "end if" -- keyword.control
+ * like "if" -- never looked wrong.
+ */
+test('a terminator is one token, coloured like the keyword that opens the block', { skip }, async () => {
+	for (const [opener, keyword, terminator] of TERMINATORS) {
+		const wanted = family(openerToken(await tokenize(opener), keyword));
+		const tokens = codeTokens(await tokenize([opener, terminator].join('\n')));
+		assert.ok(tokens.length > 0, `"${terminator}" vanished`);
+		if (terminator.includes(' ')) {
+			assert.equal(
+				tokens.length,
+				1,
+				`"${terminator}" split into ${tokens.length} tokens: ${tokens
+					.map((t) => `${JSON.stringify(t.text)}=${t.scopes.join(' ')}`)
+					.join(', ')}`,
+			);
+		}
+		for (const token of tokens) {
+			assert.equal(
+				family(token),
+				wanted,
+				`"${terminator}" should be coloured like "${keyword}" (${wanted}), got ${
+					token.scopes.join(' ') || 'no scope'
+				}`,
+			);
+		}
+	}
+});
+
+test('a terminator keeps that colour with no block open around it', { skip }, async () => {
+	// a prototype, a snippet pasted on its own, a half-typed file: there is no
+	// block state to close, and the terminator must still read as one token in
+	// the colour its opener has. (The loop words -- next/loop/wend -- are not
+	// part of this: on their own they are just identifiers, and the grammar
+	// treats them as calls, which is what it did before.)
+	const ends = TERMINATORS.filter(([, , terminator]) => terminator.toLowerCase().startsWith('end'));
+	for (const [opener, keyword, terminator] of ends) {
+		const wanted = family(openerToken(await tokenize(opener), keyword));
+		const tokens = codeTokens(await tokenize(terminator));
+		assert.ok(tokens.length > 0, `"${terminator}" vanished`);
+		if (terminator.includes(' ')) {
+			assert.equal(
+				tokens.length,
+				1,
+				`standalone "${terminator}" split into ${tokens.length} tokens: ${tokens
+					.map((t) => `${JSON.stringify(t.text)}=${t.scopes.join(' ')}`)
+					.join(', ')}`,
+			);
+		}
+		for (const token of tokens) {
+			assert.equal(
+				family(token),
+				wanted,
+				`standalone "${terminator}" should still be ${wanted}, got ${
+					token.scopes.join(' ') || 'no scope'
+				}`,
+			);
+		}
+	}
+
+	// the bare statement, with no block word after it
+	const bare = codeTokens(await tokenize('end'));
+	assert.equal(bare.length, 1, '"end" should be one token');
+	assert.equal(family(bare[0]!), 'keyword.control');
+});
+
+test('static opens a procedure body when a procedure follows', { skip }, async () => {
+	// "static" also opens a variable declaration, and used to win
+	const declared = await tokenize('static x as integer');
+	const x = declared[0]!.find((t) => t.text.trim() === 'x');
+	assert.ok(x?.scopes.includes('variable.other.freebasic'), 'static x is still a variable');
+
+	const lines = await tokenize('static sub foo()\nend sub');
+	const sub = lines[0]!.find((t) => t.text.trim() === 'sub');
+	assert.ok(
+		sub?.scopes.includes('keyword.other.declaration.procedure.body.begin.freebasic'),
+		`static sub should open a procedure body, got ${sub?.scopes.join(' ') || 'no scope'}`,
+	);
+	const stat = lines[0]!.find((t) => t.text.trim() === 'static');
+	assert.ok(
+		stat?.scopes.includes('storage.modifier.procedure.freebasic'),
+		`static should stay a modifier, got ${stat?.scopes.join(' ') || 'no scope'}`,
+	);
+	assert.equal(codeTokens(lines).length, 1, 'its "end sub" should be one token');
+});

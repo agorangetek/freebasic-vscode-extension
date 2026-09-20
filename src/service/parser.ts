@@ -101,10 +101,79 @@ const PROC_RE = new RegExp(
 );
 
 const TYPE_RE = /^\s*(type|union|enum|namespace|class)\s+([A-Za-z_]\w*)/i;
-const CONST_RE = /^\s*(?:public\s+|private\s+)?const\s+(?:shared\s+)?([A-Za-z_]\w*)/i;
+const CONST_PREFIX_RE = /^\s*(?:(?:public|private)\s+)?const\s+(?:shared\s+)?/i;
 const DEFINE_RE = /^\s*#define\s+([A-Za-z_]\w*)/i;
-const VAR_RE = /^\s*(?:dim|static|common|redim|extern)\s+(?:shared\s+)?([A-Za-z_]\w*)/i;
+const VAR_PREFIX_RE =
+	/^\s*(?:(?:public|private)\s+)?(?:dim|static|common|redim|extern|var)\s+(?:shared\s+)?/i;
 const LABEL_RE = /^\s*([A-Za-z_]\w*|\d+)\s*:(?!:)/;
+
+/**
+ * Words that can be part of a type in a type-first declaration
+ * (`dim as const string s`), which is how the type is told apart from a
+ * user-defined one (`dim as MyType t`).
+ */
+const TYPE_WORDS =
+	/^(?:const|any|ptr|byte|ubyte|short|ushort|long|ulong|longint|ulongint|integer|uinteger|single|double|boolean|string|wstring|zstring|object|function|sub)\b/i;
+
+/** Split "a, b(1, 2), c = (1, 2)" on the commas that are not inside brackets. */
+function splitDeclarators(text: string): string[] {
+	const out: string[] = [];
+	let depth = 0;
+	let current = '';
+	for (const ch of text) {
+		if (ch === '(' || ch === '[') depth++;
+		else if (ch === ')' || ch === ']') depth--;
+		if (ch === ',' && depth <= 0) {
+			out.push(current);
+			current = '';
+		} else {
+			current += ch;
+		}
+	}
+	out.push(current);
+	return out;
+}
+
+/**
+ * The names a `dim`/`static`/`redim`/`var`/`const`/... line declares.
+ *
+ * One statement can declare several variables (`dim a, b as integer`) and the
+ * type may come first (`dim shared as integer counter`), so the declarator list
+ * is split before the names are read off, and a leading type is skipped --
+ * otherwise `dim as integer x` would be recorded as a variable called "as".
+ *
+ * `var` infers its type from the initializer, so it has no type to skip and is
+ * read like any other declarator list (`var a = 1, b = "x"`).
+ */
+export function declaredNames(
+	line: string,
+): { kind: 'const' | 'variable'; names: string[] } | undefined {
+	const isConst = /^\s*(?:(?:public|private)\s+)?const\b/i.test(line);
+	const prefix = (isConst ? CONST_PREFIX_RE : VAR_PREFIX_RE).exec(line);
+	if (!prefix) return undefined;
+
+	let rest = line.slice(prefix[0].length);
+
+	// `dim as integer x`: skip the type, leaving the declarators.
+	const typeFirst = /^as\s+/i.exec(rest);
+	if (typeFirst) {
+		rest = rest.slice(typeFirst[0].length);
+		let offset = 0;
+		for (;;) {
+			const word = /^[A-Za-z_]\w*\s*/.exec(rest.slice(offset));
+			if (!word || !TYPE_WORDS.test(word[0])) break;
+			offset += word[0].length;
+		}
+		// a user-defined type name: the first word is the type
+		rest = offset > 0 ? rest.slice(offset) : rest.replace(/^[A-Za-z_]\w*\s*/, '');
+	}
+
+	const names = splitDeclarators(rest)
+		.map((declarator) => /^\s*([A-Za-z_]\w*)/.exec(declarator)?.[1])
+		.filter((name): name is string => name !== undefined);
+
+	return { kind: isConst ? 'const' : 'variable', names };
+}
 /** Finds a real (non-commented) #include directive; matched against masked text. */
 const INCLUDE_DIRECTIVE_RE = /#include\s+(?:once\s+)?/gi;
 /** Pulls the path out of a directive; matched against the original text, since
@@ -187,7 +256,7 @@ export function parseDocument(uri: string, text: string): FbDocument {
 	const includes: string[] = [];
 
 	// Scope stack: procedures and the type/enum bodies we are inside.
-	const procStack: { name: string; kind: FbSymbolKind }[] = [];
+	const procStack: { name: string; kind: FbSymbolKind; symbol: FbSymbol }[] = [];
 	const typeStack: { name: string; kind: FbSymbolKind }[] = [];
 
 	const add = (
@@ -196,9 +265,9 @@ export function parseDocument(uri: string, text: string): FbDocument {
 		lineIndex: number,
 		detail: string,
 		extra: Partial<FbSymbol> = {},
-	) => {
+	): FbSymbol => {
 		const scope = procStack.length > 0 ? procStack[procStack.length - 1].name : '';
-		symbols.push({
+		const symbol: FbSymbol = {
 			name,
 			kind,
 			line: lineIndex,
@@ -207,7 +276,9 @@ export function parseDocument(uri: string, text: string): FbDocument {
 			file: uri,
 			doc: docAbove(lines, lineIndex),
 			...extra,
-		});
+		};
+		symbols.push(symbol);
+		return symbol;
 	};
 
 	for (let i = 0; i < masked.length; i++) {
@@ -227,8 +298,14 @@ export function parseDocument(uri: string, text: string): FbDocument {
 
 		if (END_RE.test(line)) {
 			const endWord = line.trim().split(/\s+/)[1].toLowerCase();
-			if (/^(type|union|enum|namespace|class)$/.test(endWord)) typeStack.pop();
-			else procStack.pop();
+			if (/^(type|union|enum|namespace|class)$/.test(endWord)) {
+				typeStack.pop();
+			} else {
+				// remember where the body ended: a cursor below it is not inside
+				// the procedure any more
+				const closed = procStack.pop();
+				if (closed) closed.symbol.endLine = i;
+			}
 			continue;
 		}
 
@@ -237,7 +314,7 @@ export function parseDocument(uri: string, text: string): FbDocument {
 			const kind = proc[1].toLowerCase() as FbSymbolKind;
 			const name = proc[2];
 			const params = paramListOf(source);
-			add(name, kind, i, source, {
+			const symbol = add(name, kind, i, source, {
 				params,
 				returns: kind === 'function' ? returnTypeOf(source) : undefined,
 			});
@@ -246,7 +323,7 @@ export function parseDocument(uri: string, text: string): FbDocument {
 			const isDeclarationOnly = /^\s*(?:(?:public|private|protected)\s+)?(?:declare|extern)\b/i.test(line);
 			const bodyOnSameLine = /\bend\s+(?:sub|function|constructor|destructor|property|operator)\b/i.test(line);
 			if (!isDeclarationOnly && !bodyOnSameLine) {
-				procStack.push({ name, kind });
+				procStack.push({ name, kind, symbol });
 			}
 			continue;
 		}
@@ -286,17 +363,13 @@ export function parseDocument(uri: string, text: string): FbDocument {
 			continue;
 		}
 
-		const constant = line.match(CONST_RE);
-		if (constant) {
-			add(constant[1], 'const', i, source);
-			continue;
-		}
-
-		const variable = line.match(VAR_RE);
-		if (variable) {
-			const shared = procStack.length === 0;
-			add(variable[1], 'variable', i, source, { detail: source.trim() });
-			void shared;
+		// `dim`, `static`, `redim`, `const`, ...: one statement may declare
+		// several names, and the type may come first
+		const declaration = declaredNames(line);
+		if (declaration) {
+			for (const name of declaration.names) {
+				add(name, declaration.kind, i, source, { detail: source.trim() });
+			}
 			continue;
 		}
 

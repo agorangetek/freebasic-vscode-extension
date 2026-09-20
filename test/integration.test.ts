@@ -10,12 +10,6 @@
  * Needs esbuild, so it is skipped when devDependencies are not installed.
  */
 import assert from 'node:assert/strict';
-import { lookupBuiltin } from '../src/service/builtins.ts';
-
-/** The generated data's spelling of a name. */
-function builtinName(name: string): string {
-	return lookupBuiltin(name)?.name ?? name;
-}
 import { mkdtempSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
@@ -352,8 +346,8 @@ const SAMPLE = [
 	'  dim localOnly as integer',
 	'end sub',
 	'',
-	'ScreenRes(640, 480)',
-	'print Left("abc", 2)',
+	'screenres(640, 480)',
+	'print left("abc", 2)',
 	'myS',
 	'',
 ];
@@ -428,27 +422,27 @@ test('integration: extension host wiring', { skip: !esbuild && 'esbuild not inst
 		assert.ok(commands.has('freebasic.showIndexStats'));
 	});
 
-	await t.test('completes built-ins with their conventional casing', () => {
+	await t.test('completes built-ins in lower case', () => {
 		const items = completeAt(9, 0);
-		const screenRes = items.find((i) => i.label === 'ScreenRes');
-		assert.ok(screenRes, `expected ScreenRes in ${labels(items).length} items`);
+		const screenRes = items.find((i) => i.label === 'screenres');
+		assert.ok(screenRes, `expected screenres in ${labels(items).length} items`);
 		assert.equal(screenRes.kind, vscodeMock.CompletionItemKind.Function);
 		assert.match(screenRes.detail ?? '', /width|height/i);
-		// the manual spells it "Screenres"; the examples say otherwise
+		// the language is lower case however the manual spells it
 		assert.match(
 			(screenRes.insertText as SnippetString).value,
-			/^ScreenRes\(/,
-			'manual casing must not leak into the inserted call',
+			/^screenres\(/,
+			'the inserted call must be lower case',
 		);
 	});
 
 	await t.test('completes built-ins as call snippets', () => {
 		const items = completeAt(9, 0);
-		const left = items.find((i) => i.label === 'Left');
-		assert.ok(left, 'expected Left');
+		const left = items.find((i) => i.label === 'left');
+		assert.ok(left, 'expected left');
 		assert.ok(left.insertText instanceof SnippetString, 'expected a SnippetString');
 		const snippet = left.insertText as SnippetString;
-		assert.match(snippet.value, /^Left\(\$\{1:/);
+		assert.match(snippet.value, /^left\(\$\{1:/);
 	});
 
 	await t.test('completes symbols from the current document', () => {
@@ -475,12 +469,12 @@ test('integration: extension host wiring', { skip: !esbuild && 'esbuild not inst
 		const provider = registrations.completion[0]!.provider;
 		const items = (provider.provideCompletionItems(doc, new Position(0, 2)) ??
 			[]) as CompletionItem[];
-		const screenRes = items.find((i) => i.label === 'ScreenRes');
-		assert.ok(screenRes, `expected ScreenRes, got ${labels(items).join(', ')}`);
+		const screenRes = items.find((i) => i.label === 'screenres');
+		assert.ok(screenRes, `expected screenres, got ${labels(items).join(', ')}`);
 		// the editor filters on filterText, so it has to carry the typed case
-		assert.equal(screenRes.filterText, 'SCreenRes');
+		assert.equal(screenRes.filterText, 'SCreenres');
 		// ... while the label, which is displayed and inserted, does not
-		assert.equal(screenRes.label, 'ScreenRes');
+		assert.equal(screenRes.label, 'screenres');
 		assert.equal(screenRes.filterText?.length, screenRes.label.length);
 	});
 
@@ -493,7 +487,7 @@ test('integration: extension host wiring', { skip: !esbuild && 'esbuild not inst
 			!found.includes('otherProc'),
 			'otherProc does not start with myS and must not be offered',
 		);
-		assert.ok(!found.includes('Abs'), 'nor anything else that merely contains it');
+		assert.ok(!found.includes('abs'), 'nor anything else that merely contains it');
 	});
 
 	await t.test('hovers built-ins with manual documentation', () => {
@@ -501,9 +495,9 @@ test('integration: extension host wiring', { skip: !esbuild && 'esbuild not inst
 		const hover = provider.provideHover(document, new Position(7, 3));
 		assert.ok(hover instanceof Hover);
 		const md = hover.contents as MarkdownString;
-		assert.match(md.value, /ScreenRes/);
+		assert.match(md.value, /screenres/);
 		assert.match(md.value, /Initializes a graphics mode/);
-		assert.match(md.value, /function ScreenRes \(/);
+		assert.match(md.value, /function screenres \(/);
 		assert.equal(md.isTrusted, false);
 	});
 
@@ -512,7 +506,7 @@ test('integration: extension host wiring', { skip: !esbuild && 'esbuild not inst
 		const help = provider.provideSignatureHelp(document, new Position(8, 19));
 		assert.ok(help instanceof SignatureHelp);
 		const signature = help.signatures[0]!;
-		assert.equal(signature.label, 'Left(str, n)');
+		assert.equal(signature.label, 'left(str, n)');
 		// offsets into the label, so the editor highlights the right parameter
 		assert.deepEqual(
 			signature.parameters.map((p) => p.label),
@@ -522,7 +516,7 @@ test('integration: extension host wiring', { skip: !esbuild && 'esbuild not inst
 			],
 		);
 		assert.equal(help.activeParameter, 1, 'cursor is past the comma');
-		assert.match((signature.documentation as MarkdownString).value, /function Left \(/);
+		assert.match((signature.documentation as MarkdownString).value, /function left \(/);
 	});
 
 	await t.test('an opener at the start of a statement brings its closer', () => {
@@ -561,12 +555,12 @@ test('integration: extension host wiring', { skip: !esbuild && 'esbuild not inst
 		assert.equal(registrations.rangeFormatting[0]?.selector, 'freebasic');
 	});
 
-	await t.test('Format Text capitalizes the document', async () => {
-		const doc = new TextDocument('/ws/lower.bas', [
-			'sub mySub(byval a as integer)',
-			'\tdim v as vec2',
-			'\tscreenres 640, 480',
-			'end sub',
+	await t.test('Format Text folds the language to lower case', async () => {
+		const doc = new TextDocument('/ws/casing.bas', [
+			'Sub MySub(ByVal a As Integer)',
+			'\tDim v As vec2',
+			'\tScreenRes 640, 480',
+			'End Sub',
 		]);
 		vscodeMock.workspace.textDocuments.push(doc);
 		editor.document = doc;
@@ -575,23 +569,20 @@ test('integration: extension host wiring', { skip: !esbuild && 'esbuild not inst
 		await commands.get('freebasic.formatText')!();
 
 		assert.equal(appliedEdits.length, 1, 'expected one whole-document replacement');
-		// the modifier's spelling comes from the generated data (the FreeBASIC
-		// examples corpus writes "Byval"), so read it rather than hard-coding it
-		const byval = builtinName('byval');
 		assert.equal(
 			appliedEdits[0]!.newText,
 			[
-				`sub MySub(${byval} a as integer)`,
+				'sub MySub(byval a as integer)',
 				'\tdim v as vec2',
-				'\tScreenRes 640, 480',
+				'\tscreenres 640, 480',
 				'end sub',
 			].join('\n'),
 		);
 	});
 
-	await t.test('a procedure declared in an included file is recognised', async () => {
-		// main.bas includes helper.bi; scaleBy is declared there, so its uses in
-		// main.bas are the author's procedure and get the same capitalisation
+	await t.test('a procedure declared in an included file is left as written', async () => {
+		// main.bas includes helper.bi, so scaleBy is a name the author declared:
+		// the formatter folds the language around it and leaves the name alone
 		const helper = new TextDocument('/ws/helper.bi', [
 			'function scaleBy(byval v as double) as double',
 			'\treturn v',
@@ -600,8 +591,8 @@ test('integration: extension host wiring', { skip: !esbuild && 'esbuild not inst
 		const main = new TextDocument('/ws/uses.bas', [
 			'#include once "helper.bi"',
 			'sub main()',
-			'\tdim d as double = scaleBy(2.0)',
-			'end sub',
+			'\tDim d As Double = ScaleBy(2.0)',
+			'End Sub',
 		]);
 		vscodeMock.workspace.textDocuments.push(helper, main);
 		editor.document = main;
